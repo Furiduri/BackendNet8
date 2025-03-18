@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>Controller API BaseLine</Title>
+		 <Author>Jorge Perez - Gcatcode</Author>
+            <Description>Controlador con metodos base de un controlador</Description>
+            <Shortcut>blcontroller</Shortcut>
+        </Header>
+        <Snippet>
+        
+  <Declarations>
+    <Literal>
+      <ID>ControllerName</ID>
+      <ToolTip>Enter the Controller name.</ToolTip>
+      <Default>Name</Default>
+    </Literal>
+  </Declarations>
+            <Code Language="CSharp">
+                <![CDATA[
+    [ApiController, Route("api/[controller]")]
+    public class $ControllerName$Controller : BaseController
+    {
+        public $ControllerName$Controller( IConfiguration configuration)
+            : base(configuration) 
+        {
+        }
+
+        [HttpGet, Route("")]
+        public ActionResult<string> Get()
+        { 
+            try
+            {
+                return Ok("Holi");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }            
+        }
+
+        [HttpGet, Route("{id}")]
+        public ActionResult<int> GetById(int id)
+        {            
+            try
+            {
+                return Ok(id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost, Route("")]
+        public ActionResult Post([FromBody] string data)
+        {
+            try
+            {
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpPut, Route("")]
+        public ActionResult Put([FromBody] string data)
+        {
+            try
+            {
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete, Route("{id}")]
+        public ActionResult Del(int id)
+        {
+            try
+            {
+                return Ok(id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }
+                ]]>
+            </Code>
+            <Imports>
+                <Import>
+                <Namespace>Microsoft.AspNetCore.Mvc</Namespace>
+                <Namespace>GCatcode.Api.Core</Namespace>
+                </Import>
+            </Imports>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>

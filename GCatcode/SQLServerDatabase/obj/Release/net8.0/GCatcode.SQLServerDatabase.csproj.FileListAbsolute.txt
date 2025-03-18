@@ -1,0 +1,11 @@
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\bin\Release\net8.0\GCatcode.SQLServerDatabase.deps.json
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\bin\Release\net8.0\GCatcode.SQLServerDatabase.dll
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\bin\Release\net8.0\GCatcode.SQLServerDatabase.pdb
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\GCatcode.SQLServerDatabase.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\GCatcode.SQLServerDatabase.AssemblyInfoInputs.cache
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\GCatcode.SQLServerDatabase.AssemblyInfo.cs
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\GCatcode.SQLServerDatabase.csproj.CoreCompileInputs.cache
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\GCatcode.SQLServerDatabase.dll
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\refint\GCatcode.SQLServerDatabase.dll
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\GCatcode.SQLServerDatabase.pdb
+C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\SQLServerDatabase\obj\Release\net8.0\ref\GCatcode.SQLServerDatabase.dll

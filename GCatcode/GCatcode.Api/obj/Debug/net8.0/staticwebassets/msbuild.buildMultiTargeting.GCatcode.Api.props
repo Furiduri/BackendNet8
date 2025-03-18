@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\GCatcode.Api.props" />
+</Project>

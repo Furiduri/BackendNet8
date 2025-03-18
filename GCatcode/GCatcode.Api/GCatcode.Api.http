@@ -1,0 +1,6 @@
+@GCatcode.Api_HostAddress = http://localhost:5055
+
+GET {{GCatcode.Api_HostAddress}}/*/
+Accept: application/json
+
+###

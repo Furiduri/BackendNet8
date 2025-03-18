@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>GCatcode.Repository</id>
+    <version>1.0.0</version>
+    <authors>GCatcode.Repository</authors>
+    <description>Package Description</description>
+    <repository type="git" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="GCatcode.SQLServerDatabase" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="GCatcode.Utils" version="1.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\JorgePerez\source\repos\BaseLineVueNet8\BackendNet8\GCatcode\GCatcode.Services\bin\Debug\net8.0\GCatcode.Repository.dll" target="lib\net8.0\GCatcode.Repository.dll" />
+  </files>
+</package>
