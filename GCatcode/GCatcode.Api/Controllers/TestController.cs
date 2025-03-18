@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Controllers
 {
-
     [ApiController, Route("api/[controller]")]
     public class TestController : BaseController
     {
@@ -20,7 +19,7 @@ namespace GCatcode.Api.Controllers
         public ActionResult<string> Get()
         {
             try
-            {                
+            {
                 return Ok("Holi");
             }
             catch (Exception ex)
@@ -50,7 +49,7 @@ namespace GCatcode.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]        
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public ActionResult Post([FromBody] string data)
         {
             try
@@ -60,14 +59,13 @@ namespace GCatcode.Api.Controllers
                 if (data == null)
                     return BadRequest();
 
-                return StatusCode(201,data);
+                return StatusCode(201, data);
             }
             catch (Exception ex)
             {
-                return StatusCode(500,ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
-
 
         [HttpPut, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -100,7 +98,7 @@ namespace GCatcode.Api.Controllers
         {
             try
             {
-                if(id < 0)
+                if (id < 0)
                     return BadRequest();
 
                 return Ok(id);

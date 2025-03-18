@@ -1,16 +1,14 @@
 ﻿using GCatcode.Api.Core;
-using GCatcode.Repository.DB;
-using GCatcode.SQLServerDatabase.Dtos;
-using GCatcode.SQLServerDatabase.Models;
+using GCatcode.Repository.DB.RolService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Controllers
 {
-
     [ApiController, Route("api/[controller]")]
     public class RolesController : BaseController
     {
         private readonly RolesService service;
+
         public RolesController(IConfiguration configuration)
             : base(configuration)
         {
@@ -18,24 +16,24 @@ namespace GCatcode.Api.Controllers
         }
 
         [HttpGet, Route("")]
-        public ActionResult<List<Rol>> Get()
+        public ActionResult<List<RolDTO>> Get()
         {
             try
             {
-                return Ok(service.Get(filters: new { Available = true }));
+                return Ok(service.Get());
             }
             catch (Exception ex)
             {
-               return BadRequest(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpGet, Route("{id}")]
-        public ActionResult<Rol> GetById(int id)
+        public ActionResult<RolDTO> GetById(int id)
         {
             try
             {
-                return Ok(service.GetById(id)); 
+                return Ok(service.GetById(id));
             }
             catch (Exception ex)
             {
@@ -44,7 +42,7 @@ namespace GCatcode.Api.Controllers
         }
 
         [HttpPost, Route("")]
-        public ActionResult<Rol> Post([FromBody] RolDTO data)
+        public ActionResult<RolDTO> Post([FromBody] RolUpdate data)
         {
             try
             {
@@ -56,9 +54,8 @@ namespace GCatcode.Api.Controllers
             }
         }
 
-
         [HttpPut, Route("")]
-        public ActionResult<Rol> Put([FromBody] RolDTO data)
+        public ActionResult<RolDTO> Put([FromBody] RolUpdate data)
         {
             try
             {
@@ -86,5 +83,4 @@ namespace GCatcode.Api.Controllers
             }
         }
     }
-
 }

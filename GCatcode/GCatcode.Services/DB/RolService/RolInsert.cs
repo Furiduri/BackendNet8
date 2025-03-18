@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GCatcode.SQLServerDatabase.Models
+namespace GCatcode.Repository.DB.RolService
 {
-    public class Rol : BaseTable
+    public class RolInsert
     {
-        [Key]
-        public int RolId { get; set; }
-
         [Required, MaxLength(250)]
         public string Name { get; set; }
 

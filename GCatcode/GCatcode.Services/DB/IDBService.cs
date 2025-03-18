@@ -1,11 +1,15 @@
 ﻿namespace GCatcode.Repository.DB
 {
-    public interface IDBService<T>
+    internal interface IDBService<Table, TInsert, TUpdate>
     {
-        T? GetById(int id);
+        Table? GetById(int id);
 
-        List<T> Get(int maxItems = 100, object? filters = null);
+        IEnumerable<Table> Get(int maxItems = 100, int page = 1, object? filters = null);
 
-        void Delete(int id);
+        Table Delete(int id);
+
+        Table Update(TUpdate data);
+
+        Table Insert(TInsert data);
     }
 }

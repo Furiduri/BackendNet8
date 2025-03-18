@@ -5,11 +5,11 @@ namespace GCatcode.SQLServerDatabase
 {
     public class AppDBContext : DbContext
     {
-        public DbSet<Rol> Roles {  get; set; }
-        public AppDBContext(DbContextOptions<AppDBContext> options) 
+        public DbSet<Rol> Roles { get; set; }
+
+        public AppDBContext(DbContextOptions<AppDBContext> options)
             : base(options)
-        {           
-            
+        {
         }
     }
 }

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj": {}
+    "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj": {
+    "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj",
+        "projectUniqueName": "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj",
         "projectName": "GCatcode.Api",
-        "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj",
-        "packagesPath": "C:\\Users\\JorgePerez\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Api\\obj\\",
+        "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Api\\GCatcode.Api.csproj",
+        "packagesPath": "C:\\Users\\furid\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\JorgePerez\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\furid\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,21 +26,20 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://resser.pkgs.visualstudio.com/bb769959-bce2-48d2-9e9d-c97e8c4048f6/_packaging/SiliantAutoExcel/nuget/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj": {
-                "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj"
+              "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj": {
+                "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj"
               },
-              "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj": {
-                "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj"
+              "C:\\Git\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj": {
+                "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj"
               },
-              "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj": {
-                "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj"
+              "C:\\Git\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj": {
+                "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj"
               }
             }
           }
@@ -91,24 +90,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj": {
+    "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj",
+        "projectUniqueName": "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj",
         "projectName": "GCatcode.Repository",
-        "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj",
-        "packagesPath": "C:\\Users\\JorgePerez\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\GCatcode.Services\\obj\\",
+        "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Services\\GCatcode.Repository.csproj",
+        "packagesPath": "C:\\Users\\furid\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\BackendNet8\\GCatcode\\GCatcode.Services\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\JorgePerez\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\furid\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -117,18 +116,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://resser.pkgs.visualstudio.com/bb769959-bce2-48d2-9e9d-c97e8c4048f6/_packaging/SiliantAutoExcel/nuget/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj": {
-                "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj"
-              },
-              "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj": {
-                "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj"
+              "C:\\Git\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj": {
+                "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj"
               }
             }
           }
@@ -152,6 +147,10 @@
             "Dapper": {
               "target": "Package",
               "version": "[2.1.35, )"
+            },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[5.1.6, )"
             }
           },
           "imports": [
@@ -170,24 +169,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj": {
+    "C:\\Git\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj",
+        "projectUniqueName": "C:\\Git\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj",
         "projectName": "GCatcode.SQLServerDatabase",
-        "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj",
-        "packagesPath": "C:\\Users\\JorgePerez\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\SQLServerDatabase\\obj\\",
+        "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\SQLServerDatabase\\GCatcode.SQLServerDatabase.csproj",
+        "packagesPath": "C:\\Users\\furid\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\BackendNet8\\GCatcode\\SQLServerDatabase\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\JorgePerez\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\furid\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -196,8 +195,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://resser.pkgs.visualstudio.com/bb769959-bce2-48d2-9e9d-c97e8c4048f6/_packaging/SiliantAutoExcel/nuget/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
@@ -248,24 +246,24 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj": {
+    "C:\\Git\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj",
+        "projectUniqueName": "C:\\Git\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj",
         "projectName": "GCatcode.Utils",
-        "projectPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj",
-        "packagesPath": "C:\\Users\\JorgePerez\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\JorgePerez\\source\\repos\\BaseLineVueNet8\\BackendNet8\\GCatcode\\Utils\\obj\\",
+        "projectPath": "C:\\Git\\BackendNet8\\GCatcode\\Utils\\GCatcode.Utils.csproj",
+        "packagesPath": "C:\\Users\\furid\\.nuget\\packages\\",
+        "outputPath": "C:\\Git\\BackendNet8\\GCatcode\\Utils\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\JorgePerez\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\furid\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -274,8 +272,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://resser.pkgs.visualstudio.com/bb769959-bce2-48d2-9e9d-c97e8c4048f6/_packaging/SiliantAutoExcel/nuget/v3/index.json": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
@@ -314,7 +311,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
