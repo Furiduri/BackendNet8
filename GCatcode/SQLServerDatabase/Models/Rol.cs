@@ -2,15 +2,17 @@
 
 namespace GCatcode.SQLServerDatabase.Models
 {
-    public class Rol : BaseTable
+    public class Rol : BaseModel
     {
         [Key]
         public int RolId { get; set; }
 
         [Required, MaxLength(250)]
-        public required string Name { get; set; }
+        public string Name { get; set; }
 
         [MaxLength(500)]
-        public string? Description { get; set; }
+        public string Description { get; set; }
+
+        public IEnumerable<UserRol> UserRoles { get; internal set; }
     }
 }
