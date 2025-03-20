@@ -1,30 +1,34 @@
 ﻿using Dapper;
 using GCatcode.Utils;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace GCatcode.Repository.DB.RolService
 {
     public class RolesService : IDBService<RolDTO, RolInsert, RolUpdate>
     {
-        public RolesService(IDbConnection connection)
+        public RolesService(string connectionString)
         {
-            DbConnection = connection;
+            ConnectionString = connectionString;
         }
 
-        private readonly IDbConnection DbConnection;
+        private readonly string ConnectionString;
 
         public RolDTO? GetById(int id)
         {
+            using var DbConnection = new SqlConnection(ConnectionString);
             return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[Roles] WHERE RolId = @id", new { id });
         }
 
         public IEnumerable<RolDTO> Get(int maxItems = 100, int page = 1, object? filters = null)
         {
-            return DbConnection.Query<RolDTO>($@"SELECT TOP {maxItems} * FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}");
+            using var DbConnection = new SqlConnection(ConnectionString);
+            return DbConnection.Query<RolDTO>($@"SELECT TOP {maxItems} * FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters);
         }
 
         public RolDTO Delete(int id)
         {
+            using var DbConnection = new SqlConnection(ConnectionString);
             return DbConnection.QueryFirst<RolDTO>(
                    $@"UPDATE [dbo].[Roles]
                         SET Available = 0,
@@ -41,6 +45,7 @@ namespace GCatcode.Repository.DB.RolService
 
         public RolDTO Update(RolUpdate data)
         {
+            using var DbConnection = new SqlConnection(ConnectionString);
             return DbConnection.QueryFirst<RolDTO>(
                 $@"UPDATE [dbo].[Roles]
                         SET Name = @Name,
@@ -62,6 +67,7 @@ namespace GCatcode.Repository.DB.RolService
 
         public RolDTO Insert(RolInsert data)
         {
+            using var DbConnection = new SqlConnection(ConnectionString);
             return DbConnection.QueryFirst<RolDTO>(
                 $@"
                         INSERT INTO [dbo].[Roles] (Name, Description)
