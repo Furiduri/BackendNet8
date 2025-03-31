@@ -1,12 +1,15 @@
 ﻿using GCatcode.Api.Core;
+using GCatcode.Repository.DB.RolService;
 using GCatcode.Repository.DB.UserRolService;
 using GCatcode.Repository.DB.UserService;
 using GCatcode.Utils;
 using GCatcode.Utils.extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : BaseController
@@ -16,16 +19,21 @@ namespace GCatcode.Api.Controllers
         public UsersController(IConfiguration configuration)
             :base(configuration)
         {
-            service = new UserService(_configuration.GetConnectionString("BaseLine"));
-            userRolService = new UserRolService(_configuration.GetConnectionString("BaseLine"));
+            service = new UserService(Settings.GetBaseDBConnection(_configuration));
+            userRolService = new UserRolService(Settings.GetBaseDBConnection(_configuration));
         }
 
         [HttpGet, Route("")]
-        public ActionResult<List<UserDTO>> Get()
+        public ActionResult<List<UserDTO>> Get(int page = 1, bool available = true)
         {
             try
             {
-                return Ok(service.Get(filters: new { Available = 1 }));
+                if (!IsAdmin)
+                    return Unauthorized();
+
+                if(!available)
+                    return Ok(service.Get(page: page));
+                return Ok(service.Get(page: page, filters: new { Available = 1 }));
             }
             catch (Exception ex)
             {

@@ -13,4 +13,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Utils\GCatcode.Utils.csproj" />
+  </ItemGroup>
+
 </Project>

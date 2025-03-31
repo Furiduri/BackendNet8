@@ -72,10 +72,10 @@ namespace GCatcode.SQLServerDatabase.Migrations
                 columns: new[] { "UserId", "UserName", "Email" , "Password" },
                 values: new object[,]
                 {
-                    {0, "Dev", null , "12345" },
-                    {1, "Guest", null ,"123345" },
-                    {2, "User", null ,"12345" },
-                    {3, "Admin", null , "12345"}
+                    {0, "Dev", null ,  Utils.TripleDESHelper.Encrypt("Dev12345") },
+                    {1, "Guest", null , Utils.TripleDESHelper.Encrypt("Gest12345") },
+                    {2, "User", null , Utils.TripleDESHelper.Encrypt("User12345") },
+                    {3, "Admin", null , Utils.TripleDESHelper.Encrypt("Admin12345") }
             });
 
             migrationBuilder.InsertData(

@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add DbContext
 builder.Services.AddDbContext<AppDBContext>(dbContext =>
 {
-    dbContext.UseSqlServer(builder.Configuration.GetConnectionString("BaseLine"));
+    dbContext.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"));
 });
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -17,11 +17,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = builder.Environment.IsProduction(),
+            ValidateAudience = builder.Environment.IsProduction(),
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("KeyJWT")))
+            ValidateIssuerSigningKey = builder.Environment.IsProduction(),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
 builder.Services.AddAuthorization();

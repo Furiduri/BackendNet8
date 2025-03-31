@@ -32,10 +32,10 @@ namespace GCatcode.Repository.DB.UserRolService
                 });
         }
 
-        public IEnumerable<RolUpdate> GetRolsByUserId(int userId)
+        public IEnumerable<RolItem> GetRolsByUserId(int userId)
         {
             using var DbConnection = new SqlConnection(ConnectionString);
-            return DbConnection.Query<RolUpdate>(
+            return DbConnection.Query<RolItem>(
                 @"SELECT r.* FROM [dbo].[UserRoles] ur
                     INNER JOIN [dbo].[Roles] r ON ur.RolId = r.RolId AND r.Available = 1
                     WHERE ur.UserId = @userId
