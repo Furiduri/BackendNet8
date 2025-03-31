@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using GCatcode.Utils;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace GCatcode.Repository.DB.RolService
 {
@@ -8,61 +9,76 @@ namespace GCatcode.Repository.DB.RolService
     {
         public RolesService(string connectionString)
         {
-            DbConnectionString = connectionString;
-            TableName = "Roles";
+            ConnectionString = connectionString;
         }
 
-        private readonly string DbConnectionString;
-        private readonly string TableName;
+        private readonly string ConnectionString;
 
         public RolDTO? GetById(int id)
         {
-            using (SqlConnection connection = new SqlConnection(DbConnectionString))
-            {
-                return connection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[{TableName}] WHERE RolId = @id", new { id });
-            }
+            using var DbConnection = new SqlConnection(ConnectionString);
+            return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[Roles] WHERE RolId = @id", new { id });
         }
 
         public IEnumerable<RolDTO> Get(int maxItems = 100, int page = 1, object? filters = null)
         {
-            using (SqlConnection connection = new SqlConnection(DbConnectionString))
-            {
-                return connection.Query<RolDTO>($@"SELECT TOP {maxItems} * FROM [dbo].[{TableName}] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}");
-            }
+            using var DbConnection = new SqlConnection(ConnectionString);
+            return DbConnection.Query<RolDTO>($@"SELECT TOP {maxItems} * FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters);
         }
 
         public RolDTO Delete(int id)
         {
-            throw new NotImplementedException();
+            using var DbConnection = new SqlConnection(ConnectionString);
+            return DbConnection.QueryFirst<RolDTO>(
+                   $@"UPDATE [dbo].[Roles]
+                        SET Available = 0,
+                            LastUpdated = @dateTime
+                        WHERE RolId = @RolId
+                        SELECT * FROM [dbo].[Roles] WHERE RolId = @id
+            ",
+            new
+            {
+                id,
+                dateTime = DateTime.UtcNow
+            });
         }
 
         public RolDTO Update(RolUpdate data)
         {
-            using (SqlConnection connection = new SqlConnection(DbConnectionString))
-            {
-                return connection.QueryFirst<RolDTO>(
-                    $@"UPDATE [dbo].[{TableName}]
+            using var DbConnection = new SqlConnection(ConnectionString);
+            return DbConnection.QueryFirst<RolDTO>(
+                $@"UPDATE [dbo].[Roles]
                         SET Name = @Name,
                             Description = @Description,
                             Available = @Available,
                             LastUpdated = @dateTime
                         WHERE RolId = @RolId
-                        SELECT * FROM [dbo].[{TableName}] WHERE RolId = @RolId
+                        SELECT * FROM [dbo].[Roles] WHERE RolId = @RolId
                         ",
-                    new
-                    {
-                        data.RolId,
-                        data.Name,
-                        data.Description,
-                        data.Available,
-                        dateTime = DateTime.UtcNow
-                    });
-            }
+                new
+                {
+                    data.RolId,
+                    data.Name,
+                    data.Description,
+                    data.Available,
+                    dateTime = DateTime.UtcNow
+                });
         }
 
         public RolDTO Insert(RolInsert data)
         {
-            throw new NotImplementedException();
+            using var DbConnection = new SqlConnection(ConnectionString);
+            return DbConnection.QueryFirst<RolDTO>(
+                $@"
+                        INSERT INTO [dbo].[Roles] (Name, Description)
+                        VALUES (@Name, @Description)
+                        SELECT * FROM [dbo].[Roles] WHERE RolId = @@IDENTITY
+                        ",
+                new
+                {
+                    data.Name,
+                    data.Description
+                });
         }
     }
 }

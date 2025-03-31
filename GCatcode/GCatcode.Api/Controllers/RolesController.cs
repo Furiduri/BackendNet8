@@ -1,6 +1,10 @@
 ﻿using GCatcode.Api.Core;
 using GCatcode.Repository.DB.RolService;
+using GCatcode.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using System.Data;
+using System.Data.Common;
 
 namespace GCatcode.Api.Controllers
 {
@@ -8,11 +12,10 @@ namespace GCatcode.Api.Controllers
     public class RolesController : BaseController
     {
         private readonly RolesService service;
-
         public RolesController(IConfiguration configuration)
             : base(configuration)
         {
-            service = new RolesService(_configuration.GetConnectionString("BaseLine"));
+            service = new RolesService(Settings.GetBaseDBConnection(_configuration));
         }
 
         [HttpGet, Route("")]
