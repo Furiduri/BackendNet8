@@ -1,7 +1,6 @@
 ﻿using GCatcode.Api.Core;
-using GCatcode.Repository.DB.RolService;
-using GCatcode.Repository.DB.UserRolService;
-using GCatcode.Repository.DB.UserService;
+using GCatcode.Repository.DB.UserRolServices;
+using GCatcode.Repository.DB.UserServices;
 using GCatcode.Utils;
 using GCatcode.Utils.extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -14,13 +13,9 @@ namespace GCatcode.Api.Controllers
     [ApiController]
     public class UsersController : BaseController
     {
-        private readonly UserService service;
-        private readonly UserRolService userRolService;
         public UsersController(IConfiguration configuration)
-            :base(configuration)
+            : base(configuration)
         {
-            service = new UserService(Settings.GetBaseDBConnection(_configuration));
-            userRolService = new UserRolService(Settings.GetBaseDBConnection(_configuration));
         }
 
         [HttpGet, Route("")]
@@ -31,7 +26,8 @@ namespace GCatcode.Api.Controllers
                 if (!IsAdmin)
                     return Unauthorized();
 
-                if(!available)
+                var service = new UserService(_connection);
+                if (!available)
                     return Ok(service.Get(page: page));
                 return Ok(service.Get(page: page, filters: new { Available = 1 }));
             }
@@ -46,13 +42,15 @@ namespace GCatcode.Api.Controllers
         {
             try
             {
+                var service = new UserService(_connection);
+                var userRolService = new UserRolService(_connection);
                 UserDTO userDto = service.GetById(id);
                 UserAndRols userAndRols = new UserAndRols
                 {
                     UserId = userDto.UserId,
                     UserName = userDto.UserName,
                     Email = userDto.Email,
-                    Roles =  userRolService.GetRolsByUserId(id)
+                    Roles = userRolService.GetRolsByUserId(id)
                 };
                 return Ok(userAndRols);
             }
@@ -65,71 +63,89 @@ namespace GCatcode.Api.Controllers
         [HttpPost, Route("")]
         public ActionResult<UserDTO> Post([FromBody] UserInsert data)
         {
-            try
+            using (var transaction = _connection.BeginTransaction())
             {
-                if(service.CheckUserName(data.UserName))
-                    return BadRequest("User name already exists");
-                if (!data.Email.ValidateEmail())
-                    return BadRequest("Invalid email");
-                if (!data.Password.ValidatePassword())
-                    return BadRequest("Invalid password, use lowercase, uppercase, numbers and symbols, min length 8.");
-
-                return Ok(service.Insert(data));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    var service = new UserService(_connection);
+                    var res = service.Insert(data);
+                    transaction.Commit();
+                    return Ok(res);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(ex.Message);
+                }
             }
         }
 
         [HttpPut, Route("")]
         public ActionResult<UserDTO> Put([FromBody] UserUpdate data)
         {
-            try
+            using (var transaction = _connection.BeginTransaction())
             {
-
-                if (service.CheckUserName(data.UserName, data.UserId))
-                    return BadRequest("User name already exists");
-                if (!data.Email.ValidateEmail())
-                    return BadRequest("Invalid email");
-                if (!TripleDESHelper.Decrypt(data.Password).ValidatePassword())
-                    return BadRequest("Invalid password, use lowercase, uppercase, numbers and symbols, min length 8.");
-
-                return Ok(service.Update(data));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    var service = new UserService(_connection);
+                    var res = service.Update(data);
+                    transaction.Commit();
+                    return Ok(res);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(ex.Message);
+                }
             }
         }
 
         [HttpPut, Route("ChangePassword")]
         public ActionResult<UserDTO> ChangePassword([FromBody] UserChangePassword data)
         {
-            try
+            using (var transaction = _connection.BeginTransaction())
             {
-                if (!TripleDESHelper.Decrypt(data.NewPassword).ValidatePassword())
-                    return BadRequest("Invalid password, use lowercase, uppercase, numbers and symbols, min length 8.");
-                if(!service.ValidPassword(new UserLogin { Username = data.UserName, Password = data.OldPassword }))
-                    return BadRequest("Invalid password");
-                return Ok(service.ChangePassword(data));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    if (!TripleDESHelper.Decrypt(data.NewPassword).ValidatePassword())
+                        return BadRequest("Invalid password, use lowercase, uppercase, numbers and symbols, min length 8.");
+
+                    var service = new UserService(_connection);
+                    if (!service.ValidPassword(new UserLogin { Username = data.UserName, Password = data.OldPassword }))
+                        return BadRequest("Invalid password");
+                    var res = service.ChangePassword(data);
+                    transaction.Commit();
+                    return Ok(res);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(ex.Message);
+                }
             }
         }
 
         [HttpDelete, Route("{id}")]
         public ActionResult<UserDTO> Delete(int id)
         {
-            try
+            if (!IsAdmin)
+                return Unauthorized();
+            using (var transaction = _connection.BeginTransaction())
             {
-                return Ok(service.Delete(id));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    var service = new UserService(_connection);
+                    if (id == GetUserId())
+                        return BadRequest("You cannot delete your own user");
+                    var res = service.Delete(id);
+                    transaction.Commit();
+                    return Ok(res);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(ex.Message);
+                }
             }
         }
     }

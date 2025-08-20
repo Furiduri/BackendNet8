@@ -1,12 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace GCatcode.Utils
 {
     public class Settings
     {
-        public static string GetBaseDBConnection(IConfiguration configuration)
+        public static SqlConnection GetSqlDBConnection(IConfiguration configuration)
         {
-           return configuration.GetConnectionString("DataBase");
+           var connetion = new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
+            if (connetion == null || connetion.ConnectionString == null)
+            {
+                throw new ArgumentNullException("Connection string is not configured properly.");
+            }
+            if (connetion.State != System.Data.ConnectionState.Open)
+            {
+                connetion.Open();
+            }
+            return connetion;
         }
     }
 }

@@ -1,14 +1,15 @@
-﻿using System;
+﻿using GCatcode.Repository.DB.RolServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GCatcode.Repository.DB.UserRolService
+namespace GCatcode.Repository.DB.UserRolServices
 {
     public class UserRolDTO
     {
         public int UserId { get; set; }
-        public int RolId { get; set; }
+        public RolesType RolId { get; set; }
     }
 }

@@ -1,22 +1,22 @@
 ﻿using Dapper;
-using GCatcode.Repository.DB.RolService;
+using GCatcode.Repository.DB.RolServices;
 using Microsoft.Data.SqlClient;
 
-namespace GCatcode.Repository.DB.UserRolService
+namespace GCatcode.Repository.DB.UserRolServices
 {
-    public class UserRolService
+    public class UserRolService : DBService
     {
-
         public UserRolService(string connectionString)
+            : base(connectionString)
         {
-            ConnectionString = connectionString;
         }
 
-        private readonly string ConnectionString;
+        public UserRolService(SqlConnection dbConnection) : base(dbConnection)
+        {
+        }
 
         public UserRolDTO Delete(int UserId, int RolId)
         {
-            using var DbConnection = new SqlConnection(ConnectionString);
             return DbConnection.QueryFirst<UserRolDTO>(
                 @"UPDATE [dbo].[UserRoles]
                     SET Available = 0,
@@ -34,7 +34,6 @@ namespace GCatcode.Repository.DB.UserRolService
 
         public IEnumerable<RolItem> GetRolsByUserId(int userId)
         {
-            using var DbConnection = new SqlConnection(ConnectionString);
             return DbConnection.Query<RolItem>(
                 @"SELECT r.* FROM [dbo].[UserRoles] ur
                     INNER JOIN [dbo].[Roles] r ON ur.RolId = r.RolId AND r.Available = 1
@@ -45,7 +44,6 @@ namespace GCatcode.Repository.DB.UserRolService
 
         public UserRolDTO Insert(UserRolDTO data)
         {
-            using var DbConnection = new SqlConnection(ConnectionString);
             return DbConnection.QueryFirst<UserRolDTO>(
                 @"IF EXISTS(SELECT * FROM UserRoles WHERE UserId = @UserId AND RolId = @RolId) BEGIN
 	                UPDATE [dbo].[UserRoles]

@@ -1,7 +1,8 @@
-﻿using GCatcode.Repository.DB.RolService;
-using GCatcode.Repository.DB.UserRolService;
+﻿using GCatcode.Repository.DB.RolServices;
+using GCatcode.Repository.DB.UserRolServices;
 using GCatcode.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System.Security.Claims;
 
 namespace GCatcode.Api.Core
@@ -9,11 +10,15 @@ namespace GCatcode.Api.Core
     public class BaseController : ControllerBase
     {
         protected readonly IConfiguration _configuration;
-
+        protected readonly SqlConnection _connection;
         public BaseController(IConfiguration configuration)
-        { _configuration = configuration; }
+        { _configuration = configuration;
+          _connection = Settings.GetSqlDBConnection(_configuration);
+        }
 
         protected bool IsAdmin => GetRoles().Exists(x => x.RolId == (int)RolesType.Admin || x.RolId == (int)RolesType.Developer);
+        
+        [NonAction]
         protected string GetUserName()
         {
             try
@@ -26,6 +31,7 @@ namespace GCatcode.Api.Core
             }
         }
 
+        [NonAction]
         protected int GetUserId()
         {
             try
@@ -38,12 +44,12 @@ namespace GCatcode.Api.Core
             }
         }
 
+        [NonAction]
         protected List<RolItem> GetRoles()
         {
             try
             {
-                var userRolService = new UserRolService(Settings.GetBaseDBConnection(_configuration));
-
+                var userRolService = new UserRolService(_connection);
                 return userRolService.GetRolsByUserId(GetUserId()).ToList();
             }
             catch (Exception)

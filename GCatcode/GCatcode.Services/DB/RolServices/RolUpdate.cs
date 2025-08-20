@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace GCatcode.Repository.DB.RolService
+namespace GCatcode.Repository.DB.RolServices
 {
-    public class RolDTO
+    public class RolUpdate
     {
         public int RolId { get; set; }
 
@@ -15,8 +15,5 @@ namespace GCatcode.Repository.DB.RolService
 
         [Required, DefaultValue(true)]
         public bool Available { get; set; }
-
-        [Required]
-        public DateTime LastUpdated { get; set; }
     }
 }

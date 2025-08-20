@@ -4,6 +4,11 @@ namespace GCatcode.Utils.extensions
 {
     public static class stringExtensions
     {
+        /// <summary>
+        /// Validates an email address using a simple regex pattern.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public static bool ValidateEmail(this string email)
         {
             var trimmedEmail = email.Trim();
@@ -23,6 +28,11 @@ namespace GCatcode.Utils.extensions
             }
         }
 
+        /// <summary>
+        /// Validates a password based on the following criteria: more than 8 characters, at least one uppercase letter, one lowercase letter, one number, and one symbol.
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public static bool ValidatePassword(this string password)
         {
             var hasNumber = new Regex(@"[0-9]+");

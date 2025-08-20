@@ -1,21 +1,15 @@
 ﻿using GCatcode.Api.Core;
-using GCatcode.Repository.DB.RolService;
-using GCatcode.Utils;
+using GCatcode.Repository.DB.RolServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using System.Data.Common;
 
 namespace GCatcode.Api.Controllers
 {
     [ApiController, Route("api/[controller]")]
     public class RolesController : BaseController
     {
-        private readonly RolesService service;
         public RolesController(IConfiguration configuration)
             : base(configuration)
         {
-            service = new RolesService(Settings.GetBaseDBConnection(_configuration));
         }
 
         [HttpGet, Route("")]
@@ -23,6 +17,7 @@ namespace GCatcode.Api.Controllers
         {
             try
             {
+                var service = new RolesService(_connection);
                 return Ok(service.Get());
             }
             catch (Exception ex)
@@ -36,6 +31,7 @@ namespace GCatcode.Api.Controllers
         {
             try
             {
+                var service = new RolesService(_connection);
                 return Ok(service.GetById(id));
             }
             catch (Exception ex)
@@ -60,29 +56,45 @@ namespace GCatcode.Api.Controllers
         [HttpPut, Route("")]
         public ActionResult<RolDTO> Put([FromBody] RolUpdate data)
         {
-            try
+            using (var transaction = _connection.BeginTransaction())
             {
-                if (data.RolId >= 0)
-                    return Ok(service.Update(data));
-                else return BadRequest("RolId is required");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    if (data.RolId >= 0)
+                    {
+                        var service = new RolesService(_connection);
+                        var res = service.Update(data);
+                        transaction.Commit();
+                        return Ok(res);
+                    }
+                    else return BadRequest("RolId is required");
+
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(ex.Message);
+                }
             }
         }
 
         [HttpDelete, Route("{id}")]
         public ActionResult Del(int id)
         {
-            try
+            using (var transaction = _connection.BeginTransaction())
             {
-                service.Delete(id);
-                return Ok("Success");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
+                try
+                {
+                    var service = new RolesService(_connection);
+                    service.Delete(id);
+                    transaction.Commit();
+                    return Ok("Success");
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(ex.Message);
+                }
             }
         }
     }

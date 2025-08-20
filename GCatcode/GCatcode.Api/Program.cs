@@ -9,8 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add DbContext
 builder.Services.AddDbContext<AppDBContext>(dbContext =>
 {
-    dbContext.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"));
+    dbContext.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

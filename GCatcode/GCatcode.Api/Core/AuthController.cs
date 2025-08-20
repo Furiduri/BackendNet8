@@ -1,6 +1,5 @@
-﻿using GCatcode.Api.Core;
-using GCatcode.Repository.DB.UserRolService;
-using GCatcode.Repository.DB.UserService;
+﻿using GCatcode.Repository.DB.UserRolServices;
+using GCatcode.Repository.DB.UserServices;
 using GCatcode.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -8,19 +7,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace GCatcode.Api.Controllers
+namespace GCatcode.Api.Core
 {
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : BaseController
     {
         private readonly UserService service;
-        private readonly UserRolService userRolService;
 
         public AuthController(IConfiguration configuration)
             : base(configuration)
         {
-            service = new UserService(Settings.GetBaseDBConnection(_configuration));
+            service = new UserService(_connection);
         }
 
         [HttpPost("login")]
@@ -39,6 +37,30 @@ namespace GCatcode.Api.Controllers
             }
             return Unauthorized();
         }
+
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] UserInsert user)
+        {            
+            using (var transaction = _connection.BeginTransaction())
+            {
+                try
+                {
+                    var userCreated = service.Insert(user);
+                    if(userCreated == null)
+                    {
+                        return BadRequest("User creation failed.");
+                    }
+
+                    var token = GenerateJwtToken(userCreated);
+                    return Ok(new { token });
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    return BadRequest(ex.Message);
+                }
+            }
+        }  
 
         private string GenerateJwtToken(UserDTO user)
         {

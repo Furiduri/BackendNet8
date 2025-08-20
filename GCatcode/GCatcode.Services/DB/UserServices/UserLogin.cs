@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GCatcode.Repository.DB.UserService
+namespace GCatcode.Repository.DB.UserServices
 {
     public class UserLogin
     {

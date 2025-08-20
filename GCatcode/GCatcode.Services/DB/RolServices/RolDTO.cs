@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GCatcode.Repository.DB.RolService
+namespace GCatcode.Repository.DB.RolServices
 {
-    public class RolItem
+    public class RolDTO
     {
         public int RolId { get; set; }
 
@@ -16,5 +12,11 @@ namespace GCatcode.Repository.DB.RolService
 
         [MaxLength(500)]
         public string? Description { get; set; }
+
+        [Required, DefaultValue(true)]
+        public bool Available { get; set; }
+
+        [Required]
+        public DateTime LastUpdated { get; set; }
     }
 }

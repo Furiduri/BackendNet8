@@ -1,4 +1,4 @@
-﻿namespace GCatcode.Repository.DB.UserService
+﻿namespace GCatcode.Repository.DB.UserServices
 {
     public class UserUpdate
     {
