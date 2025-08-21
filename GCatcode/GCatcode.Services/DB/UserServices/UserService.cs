@@ -3,6 +3,7 @@ using GCatcode.Repository.DB.UserRolServices;
 using GCatcode.Utils;
 using GCatcode.Utils.extensions;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace GCatcode.Repository.DB.UserServices
 {
@@ -13,7 +14,13 @@ namespace GCatcode.Repository.DB.UserServices
         {
         }
 
-        public UserService(SqlConnection dbConnection) : base(dbConnection)
+        public UserService(SqlConnection dbConnection, IDbTransaction transaction) 
+            : base(dbConnection, transaction)
+        {
+        }
+
+        public UserService(SqlConnection dbConnection) 
+            : base(dbConnection, null)
         {
         }
 
@@ -39,14 +46,14 @@ namespace GCatcode.Repository.DB.UserServices
                     data.UserId,
                     Password = data.NewPassword,
                     dateTime = DateTime.UtcNow
-                });
+                }, Transaction);
             return new { message = "Password changed successfully" };
         }
 
         public bool CheckUserName(string userName, int? userId = null)
         {
             UserDTO? user = DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserName = @userName AND UserId != @userId", new { userName, userId });
+                @"SELECT * FROM [dbo].[Users] WHERE UserName = @userName AND UserId != @userId", new { userName, userId }, Transaction);
             return user != null;
         }
 
@@ -63,41 +70,41 @@ namespace GCatcode.Repository.DB.UserServices
                 {
                     UserId = id,
                     dateTime = DateTime.UtcNow
-                });
+                }, Transaction);
         }
 
         public IEnumerable<UserDTO> Get(int maxItems = 100, int page = 1, object filters = null)
         {
             return DbConnection.Query<UserDTO>(
-                $@"SELECT TOP {maxItems} * FROM [dbo].[Users] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters);
+                $@"SELECT TOP {maxItems} * FROM [dbo].[Users] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters, Transaction);
         }
 
         public UserDTO GetById(int id)
         {
             return DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserId = @id", new { id });
+                @"SELECT * FROM [dbo].[Users] WHERE UserId = @id", new { id }, Transaction);
         }
 
-        public UserDTO GetUserByUserName(string userName)
+        public UserDTO GetByUserName(string userName)
         {
             return DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserName = @userName AND Available = 1", new { userName });
+                @"SELECT * FROM [dbo].[Users] WHERE UserName = @userName AND Available = 1", new { userName }, Transaction);
         }
 
-        public UserDTO Insert(UserInsert user)
+        public UserDTO Add(UserInsert user)
         {
             ValidUser(user);
 
             var res = DbConnection.QueryFirstOrDefault<UserDTO>(
                 @"INSERT INTO [dbo].[Users] (UserName, Email, Password) VALUES (@UserName, @Email, @Password)
-                SELECT * FROM [dbo].[Users] WHERE UserId = @@IDENTITY", new { user.UserName, user.Email, user.Password });
+                SELECT * FROM [dbo].[Users] WHERE UserId = @@IDENTITY", new { user.UserName, user.Email, user.Password }, Transaction);
 
             if (res == null)
             {
                 throw new Exception("Error inserting user.");
             }
 
-            UserRolService userRolService = new UserRolService(DbConnection);
+            UserRolService userRolService = new UserRolService(DbConnection, Transaction);
             userRolService.Insert(new UserRolDTO
             {
                 UserId = res.UserId,
@@ -133,13 +140,13 @@ namespace GCatcode.Repository.DB.UserServices
                     data.Password,
                     data.Available,
                     dateTime = DateTime.UtcNow
-                });
+                }, Transaction);
         }
 
         public bool ValidPassword(UserLogin userLogin)
         {
             UserUpdate? user = DbConnection.QueryFirstOrDefault<UserUpdate>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserName = @Username", new { userLogin.Username });
+                @"SELECT * FROM [dbo].[Users] WHERE UserName = @Username", new { userLogin.Username }, Transaction);
             if (user == null)
             {
                 return false;

@@ -1,15 +1,17 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace GCatcode.Repository.DB
 {
     public abstract class DBService
     {
         protected readonly SqlConnection DbConnection;
-
-        public DBService(SqlConnection dbConnection)
+        protected IDbTransaction Transaction;
+        public DBService(SqlConnection dbConnection, IDbTransaction transaction)
         {
             DbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
             CheckConnection();
+            Transaction = transaction;
         }
 
         private void CheckConnection()
@@ -28,6 +30,7 @@ namespace GCatcode.Repository.DB
             }
             DbConnection = new SqlConnection(connectionString);
             CheckConnection();
+            Transaction = null;
         }
     }
 }

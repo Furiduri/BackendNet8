@@ -1,12 +1,11 @@
-﻿using GCatcode.Api.Core;
-using GCatcode.Repository.DB.UserRolServices;
+﻿using GCatcode.Repository.DB.UserRolServices;
 using GCatcode.Repository.DB.UserServices;
 using GCatcode.Utils;
 using GCatcode.Utils.extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GCatcode.Api.Controllers
+namespace GCatcode.Api.Core
 {
     [Authorize]
     [Route("api/[controller]")]
@@ -68,7 +67,7 @@ namespace GCatcode.Api.Controllers
                 try
                 {
                     var service = new UserService(_connection);
-                    var res = service.Insert(data);
+                    var res = service.Add(data);
                     transaction.Commit();
                     return Ok(res);
                 }

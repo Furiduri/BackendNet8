@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using GCatcode.Utils;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace GCatcode.Repository.DB.RolServices
 {
@@ -11,19 +12,24 @@ namespace GCatcode.Repository.DB.RolServices
         {
         }
 
+        public RolesService(SqlConnection sqlConnection, IDbTransaction transaction)
+            : base(sqlConnection, transaction)
+        {
+        }
+
         public RolesService(SqlConnection sqlConnection)
-            : base(sqlConnection)
+            : base(sqlConnection, null)
         {
         }
 
         public RolDTO? GetById(int id)
         {
-            return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[Roles] WHERE RolId = @id", new { id });
+            return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[Roles] WHERE RolId = @id", new { id }, Transaction);
         }
 
         public IEnumerable<RolDTO> Get(int maxItems = 100, int page = 1, object? filters = null)
         {
-            return DbConnection.Query<RolDTO>($@"SELECT TOP {maxItems} * FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters);
+            return DbConnection.Query<RolDTO>($@"SELECT TOP {maxItems} * FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters, Transaction);
         }
 
         public RolDTO Delete(int id)
@@ -39,7 +45,7 @@ namespace GCatcode.Repository.DB.RolServices
             {
                 id,
                 dateTime = DateTime.UtcNow
-            });
+            }, Transaction);
         }
 
         public RolDTO Update(RolUpdate data)
@@ -60,10 +66,10 @@ namespace GCatcode.Repository.DB.RolServices
                     data.Description,
                     data.Available,
                     dateTime = DateTime.UtcNow
-                });
+                }, Transaction);
         }
 
-        public RolDTO Insert(RolInsert data)
+        public RolDTO Add(RolInsert data)
         {
             return DbConnection.QueryFirst<RolDTO>(
                 $@"
@@ -75,7 +81,7 @@ namespace GCatcode.Repository.DB.RolServices
                 {
                     data.Name,
                     data.Description
-                });
+                }, Transaction);
         }
     }
 }

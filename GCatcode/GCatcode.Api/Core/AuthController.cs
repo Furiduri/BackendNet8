@@ -13,18 +13,17 @@ namespace GCatcode.Api.Core
     [Route("api/[controller]")]
     public class AuthController : BaseController
     {
-        private readonly UserService service;
-
         public AuthController(IConfiguration configuration)
             : base(configuration)
         {
-            service = new UserService(_connection);
         }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin user)
         {
-            UserDTO userDto = service.GetUserByUserName(user.Username);
+
+            var service = new UserService(_connection);
+            UserDTO userDto = service.GetByUserName(user.Username);
             if (userDto == null)
             {
                 return Unauthorized();
@@ -45,7 +44,8 @@ namespace GCatcode.Api.Core
             {
                 try
                 {
-                    var userCreated = service.Insert(user);
+                    var service = new UserService(_connection, transaction);
+                    var userCreated = service.Add(user);
                     if(userCreated == null)
                     {
                         return BadRequest("User creation failed.");

@@ -10,6 +10,6 @@
 
         Table Update(TUpdate data);
 
-        Table Insert(TInsert data);
+        Table Add(TInsert data);
     }
 }

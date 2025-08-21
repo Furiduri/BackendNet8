@@ -6,11 +6,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GCatcode.SQLServerDatabase.Migrations
 {
     /// <inheritdoc />
-    public partial class UserUserRolTables : Migration
+    public partial class BaseUserRoles : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    RolId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.RolId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -20,9 +37,9 @@ namespace GCatcode.SQLServerDatabase.Migrations
                     UserName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Available = table.Column<bool>(type: "bit", defaultValue: true, nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "datetime", defaultValue: DateTime.UtcNow, nullable: false),
-                    CreateTime = table.Column<DateTime>(type: "datetime", defaultValue: DateTime.UtcNow, nullable: false)
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -35,9 +52,9 @@ namespace GCatcode.SQLServerDatabase.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
                     RolId = table.Column<int>(type: "int", nullable: false),
-                    Available = table.Column<bool>(type: "bit", defaultValue: true, nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "datetime", defaultValue: DateTime.UtcNow, nullable: false),
-                    CreateTime = table.Column<DateTime>(type: "datetime", defaultValue: DateTime.UtcNow, nullable: false)
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -47,13 +64,13 @@ namespace GCatcode.SQLServerDatabase.Migrations
                         column: x => x.RolId,
                         principalTable: "Roles",
                         principalColumn: "RolId",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -67,15 +84,27 @@ namespace GCatcode.SQLServerDatabase.Migrations
                 column: "UserName",
                 unique: true);
 
+
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "UserId", "UserName", "Email" , "Password" },
+                columns: new[] { "UserId", "UserName", "Email", "Password" },
                 values: new object[,]
                 {
                     {0, "Dev", null ,  Utils.TripleDESHelper.Encrypt("Dev12345") },
                     {1, "Guest", null , Utils.TripleDESHelper.Encrypt("Gest12345") },
                     {2, "User", null , Utils.TripleDESHelper.Encrypt("User12345") },
                     {3, "Admin", null , Utils.TripleDESHelper.Encrypt("Admin12345") }
+            });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "RolId", "Name", "Description" },
+                values: new object[,]
+                {
+                    {0, "Dev", "All Access Development" },
+                    {1, "Guest", "Limited Access" },
+                    {2, "User", "Access parcial" },
+                    {3, "Admin" , "All Access Administration"}
             });
 
             migrationBuilder.InsertData(
@@ -98,6 +127,9 @@ namespace GCatcode.SQLServerDatabase.Migrations
         {
             migrationBuilder.DropTable(
                 name: "UserRoles");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Users");

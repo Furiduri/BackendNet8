@@ -1,4 +1,5 @@
-﻿using GCatcode.SQLServerDatabase.Models;
+﻿using GCatcode.SQLServerDatabase.Configurations;
+using GCatcode.SQLServerDatabase.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace GCatcode.SQLServerDatabase
@@ -11,16 +12,9 @@ namespace GCatcode.SQLServerDatabase
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserRol>()
-                .HasKey(ur => new { ur.UserId, ur.RolId });
-            modelBuilder.Entity<UserRol>()
-                .HasOne(ur => ur.User)
-                .WithMany(u => u.UserRoles)
-                .HasForeignKey(ur => ur.UserId);
-            modelBuilder.Entity<UserRol>()
-                .HasOne(ur => ur.Rol)
-                .WithMany(r => r.UserRoles)
-                .HasForeignKey(ur => ur.RolId);
+            modelBuilder.ApplyConfiguration(new BuilderUsers());
+            modelBuilder.ApplyConfiguration(new BuilderRoles());
+            modelBuilder.ApplyConfiguration(new BuilderUserRol());
         }
 
         public AppDBContext(DbContextOptions<AppDBContext> options)

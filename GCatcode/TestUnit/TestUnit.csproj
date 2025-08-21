@@ -13,9 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GCatcode.Api\GCatcode.Api.csproj" />
     <ProjectReference Include="..\GCatcode.Services\GCatcode.Repository.csproj" />
-    <ProjectReference Include="..\SQLServerDatabase\GCatcode.SQLServerDatabase.csproj" />
     <ProjectReference Include="..\Utils\GCatcode.Utils.csproj" />
   </ItemGroup>
 

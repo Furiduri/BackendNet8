@@ -15,7 +15,7 @@
         [TestMethod]
         public void TestTripleDESHelper()
         {
-            var res =  TripleDESHelper.Encrypt("Hola Mundo");
+            var res = TripleDESHelper.Encrypt("Hola Mundo");
             Assert.AreEqual("Hola Mundo", TripleDESHelper.Decrypt(res));
         }
     }

@@ -1,9 +1,10 @@
-﻿using GCatcode.Api.Core;
-using GCatcode.Repository.DB.RolServices;
+﻿using GCatcode.Repository.DB.RolServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GCatcode.Api.Controllers
+namespace GCatcode.Api.Core
 {
+    [Authorize]
     [ApiController, Route("api/[controller]")]
     public class RolesController : BaseController
     {
@@ -68,7 +69,6 @@ namespace GCatcode.Api.Controllers
                         return Ok(res);
                     }
                     else return BadRequest("RolId is required");
-
                 }
                 catch (Exception ex)
                 {

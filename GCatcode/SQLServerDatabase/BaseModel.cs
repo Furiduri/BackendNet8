@@ -6,12 +6,12 @@ namespace GCatcode.SQLServerDatabase
     public class BaseModel
     {
         [Required, DefaultValue(true)]
-        public bool Available { get; set; } = true;
+        public bool Available { get; set; }
 
         [Required]
-        public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
+        public DateTime LastUpdated { get; set; }
 
         [Required]
-        public DateTime CreateTime { get; set; } = DateTime.UtcNow;
+        public DateTime CreateTime { get; set; }
     }
 }
