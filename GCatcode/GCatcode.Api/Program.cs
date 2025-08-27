@@ -12,6 +12,16 @@ builder.Services.AddDbContext<AppDBContext>(dbContext =>
     dbContext.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyAllowSpecificOrigins", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost", "https://anotherdomain.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Add Auth
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -44,7 +54,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("MyAllowSpecificOrigins"); // Apply the named policy here
 app.UseAuthentication();
 app.UseAuthorization();
 

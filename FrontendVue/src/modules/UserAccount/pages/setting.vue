@@ -1,6 +1,6 @@
 <template>
   <div class="wrap-user-setting">
-    账号设置
+    
   </div>
 </template>
 
@@ -10,9 +10,5 @@ export default defineComponent({
 })
 </script>
 <style lang='scss' scoped>
-// @use url(); 引入公共css类
 
-.wrap-user-setting {
-
-}
 </style>

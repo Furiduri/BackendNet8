@@ -36,10 +36,7 @@
           <img
             src="@/assets/images/pinia.svg"
             alt=""
-          >
-          <!-- <el-icon>
-            <Promotion />
-          </el-icon> -->
+          >          
         </template>
       </UserAccountContainerLayout>
     </div>
@@ -74,10 +71,10 @@ export default defineComponent({
     const router = useRouter()
 
     const isLoading = ref(true)
-    const inputErrorEmail = ref('')
+    // const inputErrorEmail = ref('')
     const inputErrorPassword = ref('')
     const formData = reactive({
-      userName: 'Dev',
+      username: 'Dev',
       password: 'Dev12345.'
     })
 
@@ -104,22 +101,21 @@ export default defineComponent({
         formConfig: [
           {
             attrs: {
-              prop: 'userName',
-              error: inputErrorEmail.value,
+              prop: 'username',              
               rules () {
                 return [
                   proxy.getRequiredRules({
                     trigger: 'change',
-                    message: localeInject.t('login.plsemail')
+                    message: localeInject.t('login.plsusername')
                   })
                 ]
               }
             },
-            label: localeInject.t('login.email'),
+            label: localeInject.t('login.username'),
             prefixIcon: h('span', {
               class: 'text-16px i-ic:baseline-mail-lock'
             }),
-            placeholder: localeInject.t('login.plsemail')
+            placeholder: localeInject.t('login.plsusername')
           },
           {
             attrs: {
@@ -162,19 +158,19 @@ export default defineComponent({
 
       refForm.validate(async (valid: boolean) => {
         if (!valid) return
-        inputErrorEmail.value = ''
+        //inputErrorEmail.value = ''
         inputErrorPassword.value = ''
 
         setLoading(true)
         const { error, data, msg } = await userAccountStore.login(formData)
         if (error) {
-          inputErrorEmail.value = ' '
+          //inputErrorEmail.value = ' '
           inputErrorPassword.value = msg as string
           setLoading(false)
           return
         }
 
-        Cookie.set('token', data!.user.token)
+        Cookie.set('token', data!.token)
         router
           .replace(`/${ route.params.locale || '' }`)
           .then(() => {
@@ -196,7 +192,7 @@ export default defineComponent({
 
     return {
       isLoading,
-      inputErrorEmail,
+      // inputErrorEmail,
       inputErrorPassword,
       formData,
       configLogin,

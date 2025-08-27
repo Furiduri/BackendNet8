@@ -23,7 +23,7 @@ function validatorRules(
 function requiredRules (params = {}) {
   const { trigger, message } = Object.assign({}, {
     trigger: 'blur',
-    message: '不能为空'
+    message: 'Cannot be empty'
   }, params)
 
   return validatorRules((rule: any, value: string, callback: any) => {
@@ -47,7 +47,7 @@ function requiredRules (params = {}) {
 function requiredRadioRules (params = {}) {
   const { trigger, message } = Object.assign({}, {
     trigger: 'change',
-    message: '不能为空'
+    message: 'Cannot be empty'
   }, params)
   return validatorRules((rule: any, value: string, callback: any) => {
     if (['boolean', 'number'].includes(typeof value)) {
@@ -57,8 +57,8 @@ function requiredRadioRules (params = {}) {
     }
   }, trigger)
 }
-function imageListRules (errMsg = '请上传全部图片') {
-  const errSingle = '请选择一张图片'
+function imageListRules (errMsg = 'Please upload all images') {
+  const errSingle = 'Please select an image'
   const validator = (rule: any, value: any[], callback: any) => {
     if (!value) {
       callback(new Error(errSingle))

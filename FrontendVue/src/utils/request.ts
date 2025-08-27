@@ -2,7 +2,7 @@ import type { AxiosInstance } from 'axios'
 import axios from 'axios'
 import Cookie from 'js-cookie'
 
-import { camelizeKeys, decamelizeKeys } from '@/utils/camelCase'
+// import { camelizeKeys, decamelizeKeys } from '@/utils/camelCase'
 import { useOutsideRouter } from '@/store/hooks/useOutsideRouter'
 
 // redirect error
@@ -74,16 +74,16 @@ service.interceptors.request.use(
     if (
       !(request.data instanceof FormData)
     ) {
-      request.data = decamelizeKeys(request.data)
+      request.data = request.data
     }
 
-    request.params = decamelizeKeys(request.params)
+    request.params = request.params
 
     /**
      * 让每个请求携带自定义 token
      * 请根据实际情况自行修改
      */
-    if (request.url === '/login') {
+    if (request.url === 'Auth/login') {
       return request
     }
 
@@ -124,7 +124,7 @@ service.interceptors.response.use(
         const reader = new FileReader()
         reader.onload = () => {
           response.data = JSON.parse(reader.result as string)
-          resolve(camelizeKeys(response.data))
+          resolve(response.data)
         }
 
         reader.readAsText(response.data)
@@ -137,17 +137,19 @@ service.interceptors.response.use(
       }
     }
 
-    return camelizeKeys(data)
+    return data
   },
   error => {
     /**
-     * 某些特定的接口 404 500 需要跳转
-     * 在需要重定向的接口中传入 redirect字段  值为要跳转的路由
-     *   redirect之后  调用接口的地方会继续执行
-     *   因为此时 response error
-     *   所以需要前端返回一个前端构造好的数据结构 避免前端业务部分逻辑出错
-     * 不重定向的接口则不需要传
+     * For certain specific interfaces (404, 500) that require redirection,
+     * pass the 'redirect' field in the request config with the route to redirect to.
+     * After redirection, the calling code will continue executing.
+     * Since this is a response error,
+     * the frontend should return a constructed data structure to avoid business logic errors.
+     * Interfaces that do not require redirection do not need to pass this field.
      */
+    if(import.meta.env.DEV)
+      console.error('err' + error) // for debug
     if (error.config.redirect) {
       errorRedirect(error.config.redirect)
     }
@@ -162,7 +164,7 @@ service.interceptors.response.use(
       return {
         data: {},
         error: 5000,
-        msg: '服务请求不可用，请重试或检查您的网络。'
+        msg: 'Service request unavailable, please retry or check your network.'
       }
     }
   }

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Buffers.Text;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace GCatcode.Utils
@@ -64,6 +65,13 @@ namespace GCatcode.Utils
             {
                 return cipherText;
             }
+        }
+
+        public static string DecryptBase64(string base64)
+        {
+            byte[] bytes = Convert.FromBase64String(base64);
+            string decoded = Encoding.UTF8.GetString(bytes);
+            return decoded;
         }
     }
 }

@@ -10,6 +10,7 @@ import {
 } from '@/modules/UserAccount/api'
 import { changeLocale } from '@/locales/useLocale'
 import { DEFAULT_LANG } from '@/locales/config'
+import { toBase64Unicode } from '@/utils/stringUtils'
 
 export interface IUserAccountState {
   locale: string
@@ -48,8 +49,7 @@ export const useUserAccountStore = defineStore('UserAccount', {
       this.locale = data.locale
     },
     async login (data) {
-      await sleep(100)
-      const res = await login(data)
+      const res = await login({ username: data.username, password: toBase64Unicode( data.password ) })
       return this.filterResponse(res, null, () => {})
     },
     async logout () {
@@ -58,7 +58,6 @@ export const useUserAccountStore = defineStore('UserAccount', {
     },
     async getUserInfo () {
       const res = await getUserInfoData()
-      await sleep(200)
       return this.filterResponse(res, ({ data }) => {
         this.userInfo = data
       })

@@ -2,14 +2,14 @@ const validatorPositiveInteger = (rule, value, callback) => {
   if (/(^[1-9]\d*$)/.test(value)) {
     callback()
   } else {
-    callback(new Error('请输入正整数'))
+    callback(new Error('Please enter a positive integer'))
   }
 }
 
-const validatorMaxCountFunction = (errorMsg = '最多三个', count = 3) => {
+const validatorMaxCountFunction = (errorMsg = 'Maximum three', count = 3) => {
   return (rule, value, callback) => {
     if (!value || !value.length) {
-      callback(new Error('不能为空'))
+      callback(new Error('Cannot be empty'))
     } else if (value.length > count) {
       callback(new Error(errorMsg))
     } else {

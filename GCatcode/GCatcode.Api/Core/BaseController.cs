@@ -9,6 +9,16 @@ namespace GCatcode.Api.Core
 {
     public class BaseController : ControllerBase
     {
+        public class Response<T>
+        {
+            public T Data { get; set; }
+            public string Msg { get; set; }
+
+            /// <summary>
+            /// 0 success | 1 error | 5000 failed | HTTP code
+            /// </summary>
+            public int Error { get; set; } = 0;
+        }
         protected readonly IConfiguration _configuration;
         protected readonly SqlConnection _connection;
         public BaseController(IConfiguration configuration)

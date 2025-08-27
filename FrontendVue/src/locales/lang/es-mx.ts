@@ -17,7 +17,9 @@ export default {
   pwd: 'Contraseña',
   fgtpwd: '¿Olvidaste tu contraseña?',
   plsemail: 'Por favor ingresa un correo electrónico',
+  plsusername: 'Por favor ingresa un nombre de usuario',
   plscurrentemail: 'Por favor ingresa el correo electrónico correcto',
+  plscurrentusername: 'Por favor ingresa el nombre de usuario correcto',
   plspwd: 'Por favor ingresa una contraseña',
   signout: 'Cerrar sesión',
   logingSuccess: '¡Éxito!'

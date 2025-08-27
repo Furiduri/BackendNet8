@@ -1,6 +1,8 @@
-﻿using GCatcode.Repository.DB.UserRolServices;
+﻿using GCatcode.Api.Core.Auth;
+using GCatcode.Repository.DB.UserRolServices;
 using GCatcode.Repository.DB.UserServices;
 using GCatcode.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,6 +20,19 @@ namespace GCatcode.Api.Core
         {
         }
 
+        [Authorize]
+        [HttpGet("user_info")]
+        public IActionResult GetUserInfo()
+        {
+            int userId = GetUserId();
+
+            return Ok(new {
+                email = "",
+                username = "",
+                id = userId
+            });
+        }
+
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin user)
         {
@@ -32,7 +47,13 @@ namespace GCatcode.Api.Core
             {
                 
                 var token = GenerateJwtToken(userDto);
-                return Ok(new { token });
+                return Ok(new Response<LoginResponse> {
+                    Msg = "Ok",                    
+                    Data = new LoginResponse {
+                        Token = token,
+                        User = userDto
+                    }
+                });
             }
             return Unauthorized();
         }

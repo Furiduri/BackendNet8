@@ -152,7 +152,7 @@ namespace GCatcode.Repository.DB.UserServices
                 return false;
             }
 
-            return (TripleDESHelper.Decrypt(user.Password) == TripleDESHelper.Decrypt(userLogin.Password));
+            return (TripleDESHelper.Decrypt(user.Password) == TripleDESHelper.DecryptBase64(userLogin.Password));
         }
 
         private void ValidUser(UserInsert user)

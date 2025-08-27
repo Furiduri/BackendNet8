@@ -1,27 +1,33 @@
+import { IResponse, IUser } from '@/interfaces/IAll'
 import { DEFAULT_LANG } from '@/locales/config'
 import request from '@/utils/request'
 
-export function login (data) {
-  // return request({
-  //   url: '/login',
-  //   method: 'post',
-  //   data
-  // })
+export function login (data : { username: string, password: string }) : Promise<IResponse<{
+  language: string;
+  token: string;
+  user: IUser;
+}>> {
+  return request({
+    url: 'Auth/login',
+    method: 'post',
+    data
+  })
 
-  return {
-    error: 0,
-    msg: 'OK',
-    data: {
-      language: DEFAULT_LANG,
-      user: {
-        email: 'admin@org.com',
-        username: '管理员',
-        id: '601d85900f43923hffbcs',
-        token: '4v8acea-6a89-2a2ebc-10802-9ac19003'
-      }
-    }
-  }
+  // return {
+  //   error: 0,
+  //   msg: 'OK',
+  //   data: {
+  //     language: DEFAULT_LANG,
+  //     user: {
+  //       email: 'admin@org.com',
+  //       username: '管理员',
+  //       id: '601d85900f43923hffbcs',
+  //       token: '4v8acea-6a89-2a2ebc-10802-9ac19003'
+  //     }
+  //   }
+  // }
 }
+
 export function logout () {
   return request({
     url: '/logout',
@@ -50,7 +56,6 @@ export function getUserInfoData(params = {}) {
   }
 }
 
-// 切换后端语言
 export function updateChangeLanguage (data) {
   return request({
     url: '/acl/changelanguage',
