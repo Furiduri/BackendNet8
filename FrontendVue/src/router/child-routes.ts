@@ -14,6 +14,14 @@ const childrenRoutes: Array<RouteRecordRaw> = [
     component: LayoutArea
   },
   {
+    path: 'home',
+    name: 'Home',
+    component: importModule['../modules/Home/pages/Index.vue'],
+    meta: {
+      title: 'Inicio'
+    }
+  },
+  {
     path: 'user',
     component: Layout,
     name: 'User',
@@ -52,7 +60,7 @@ const childrenRoutes: Array<RouteRecordRaw> = [
       },
       {
         path: 'list',
-        name: 'ProjectList',
+        name: 'ProjectListAdmin',
         component: importModule['../modules/Project/pages/list.vue'],
         meta: {
           title: '项目管理'
@@ -80,6 +88,29 @@ const childrenRoutes: Array<RouteRecordRaw> = [
         component: importModule['../modules/Result/pages/overview.vue'],
         meta: {
           title: '总览'
+        }
+      }
+    ]
+  },
+  {
+    path: 'user-management',
+    component: Layout,
+    name: 'UserManagement',
+    meta: {
+      title: 'Gestión de Usuarios',
+      roles: ['Admin', 'Developer']
+    },
+    redirect: {
+      name: 'UserCreate'
+    },
+    children: [
+      {
+        path: 'create',
+        name: 'UserCreate',
+        component: importModule['../modules/UserManagement/pages/CreateUser.vue'],
+        meta: {
+          title: 'Crear Usuario',
+          roles: ['Admin', 'Developer']
         }
       }
     ]

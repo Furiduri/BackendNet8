@@ -1,4 +1,7 @@
 ﻿using GCatcode.Repository.DB.UserServices;
+using GCatcode.Utils;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace TestUnit.Repository
 {
@@ -14,24 +17,25 @@ namespace TestUnit.Repository
         {
             using (var transaction = _connection.BeginTransaction())
             {
-                UserService userService = new UserService(_connection, transaction);
+                IUserService userService = new UserService(_connection, transaction);
                 var users = userService.Get();
                 Assert.IsNotNull(users);
+                Assert.IsTrue(users.Any());
             }
         }
 
         [TestMethod]
         public void TestGetUserById()
         {
-            UserService userService = new UserService(_connection);
-            var user = userService.Get(1);
+            IUserService userService = new UserService(_connection);
+            var user = userService.GetById(1);
             Assert.IsNotNull(user);
         }
 
         [TestMethod]
         public void TestGetUserByName()
         {
-            UserService userService = new UserService(_connection);
+            IUserService userService = new UserService(_connection);
             var user = userService.GetByUserName("Dev");
             Assert.IsNotNull(user);
         }
@@ -41,14 +45,19 @@ namespace TestUnit.Repository
         {
             using (var transaction = _connection.BeginTransaction())
             {
-                UserService userService = new UserService(_connection, transaction);
-                var user = userService.Add(new UserInsert
+                IUserService userService = new UserService(_connection, transaction);
+                var userInsert = new UserInsert
                 {
-                    UserName = "TestUser",
-                    Password = "TestPassword2.5",
+                    UserName = "TestUser_" + Guid.NewGuid().ToString().Substring(0, 8),
+                    Password = "TestPassword2.5!",
                     Email = "TestEmail@test.com"
-                });
+                };
+                var user = userService.Add(userInsert);
                 Assert.IsNotNull(user);
+                var userWhitPassword = userService.GetUpdateById(user.UserId);
+                Assert.IsTrue(Argon2Helper.VerifyPassword(userInsert.Password, userWhitPassword.Password));
+                
+                // Rollback is implicit if not committed, but I'll leave it as is for clarity (or just not commit)
             }
         }
     }

@@ -20,6 +20,16 @@
           />
           {{ _t('project.create') }}
         </el-button>
+
+        <el-button
+          v-if="userAccountStore.isAdminOrDev"
+          type="success"
+          class="create-action mt-4"
+          @click="$router.push('/user-management/create')"
+        >
+          <span class="i-ic:baseline-person-add text-18px mr-2"></span>
+          Gestión de Usuarios
+        </el-button>
       </LayoutSection>
     </template>
 
@@ -57,6 +67,7 @@ import ProjectTableBody from '@/modules/Project/components/TableBody.vue'
 import { sleep } from '@/utils/request'
 
 import { useProjectStore } from '@/modules/Project/store'
+import { useUserAccountStore } from '@/modules/UserAccount/store'
 
 export default defineComponent({
   name: 'ProjectList',
@@ -70,6 +81,7 @@ export default defineComponent({
   setup () {
     const { proxy } = useCurrentInstance()
     const projectStore = useProjectStore()
+    const userAccountStore = useUserAccountStore()
     const localeInject = useI18n()
 
     function handleCreateProject () {
@@ -121,7 +133,8 @@ export default defineComponent({
       testI18nDate,
 
       handleCreateProject,
-      handleSelectSearch
+      handleSelectSearch,
+      userAccountStore
     }
   }
 })

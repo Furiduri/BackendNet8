@@ -12,8 +12,8 @@ namespace GCatcode.Api.Core
     [ApiController]
     public class UsersController : BaseController
     {
-        public UsersController(IConfiguration configuration)
-            : base(configuration)
+        public UsersController(IConfiguration configuration, IUserService userService, IUserRolService userRolService)
+            : base(configuration, userService, userRolService)
         {
         }
 
@@ -25,10 +25,9 @@ namespace GCatcode.Api.Core
                 if (!IsAdmin)
                     return Unauthorized();
 
-                var service = new UserService(_connection);
                 if (!available)
-                    return Ok(service.Get(page: page));
-                return Ok(service.Get(page: page, filters: new { Available = 1 }));
+                    return Ok(_userService.Get(page: page));
+                return Ok(_userService.Get(page: page, filters: new { Available = 1 }));
             }
             catch (Exception ex)
             {
@@ -41,15 +40,13 @@ namespace GCatcode.Api.Core
         {
             try
             {
-                var service = new UserService(_connection);
-                var userRolService = new UserRolService(_connection);
-                UserDTO userDto = service.GetById(id);
+                UserDTO userDto = _userService.GetById(id);
                 UserAndRols userAndRols = new UserAndRols
                 {
                     UserId = userDto.UserId,
                     UserName = userDto.UserName,
                     Email = userDto.Email,
-                    Roles = userRolService.GetRolsByUserId(id)
+                    Roles = _userRolService.GetRolsByUserId(id)
                 };
                 return Ok(userAndRols);
             }
@@ -62,65 +59,42 @@ namespace GCatcode.Api.Core
         [HttpPost, Route("")]
         public ActionResult<UserDTO> Post([FromBody] UserInsert data)
         {
-            using (var transaction = _connection.BeginTransaction())
+            try
             {
-                try
-                {
-                    var service = new UserService(_connection);
-                    var res = service.Add(data);
-                    transaction.Commit();
-                    return Ok(res);
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    return BadRequest(ex.Message);
-                }
+                var res = _userService.Add(data);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpPut, Route("")]
         public ActionResult<UserDTO> Put([FromBody] UserUpdate data)
         {
-            using (var transaction = _connection.BeginTransaction())
+            try
             {
-                try
-                {
-                    var service = new UserService(_connection);
-                    var res = service.Update(data);
-                    transaction.Commit();
-                    return Ok(res);
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    return BadRequest(ex.Message);
-                }
+                var res = _userService.Update(data);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpPut, Route("ChangePassword")]
         public ActionResult<UserDTO> ChangePassword([FromBody] UserChangePassword data)
         {
-            using (var transaction = _connection.BeginTransaction())
+            try
             {
-                try
-                {
-                    if (!TripleDESHelper.Decrypt(data.NewPassword).ValidatePassword())
-                        return BadRequest("Invalid password, use lowercase, uppercase, numbers and symbols, min length 8.");
-
-                    var service = new UserService(_connection);
-                    if (!service.ValidPassword(new UserLogin { Username = data.UserName, Password = data.OldPassword }))
-                        return BadRequest("Invalid password");
-                    var res = service.ChangePassword(data);
-                    transaction.Commit();
-                    return Ok(res);
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    return BadRequest(ex.Message);
-                }
+                var res = _userService.ChangePassword(data);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -129,22 +103,16 @@ namespace GCatcode.Api.Core
         {
             if (!IsAdmin)
                 return Unauthorized();
-            using (var transaction = _connection.BeginTransaction())
+            try
             {
-                try
-                {
-                    var service = new UserService(_connection);
-                    if (id == GetUserId())
-                        return BadRequest("You cannot delete your own user");
-                    var res = service.Delete(id);
-                    transaction.Commit();
-                    return Ok(res);
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    return BadRequest(ex.Message);
-                }
+                if (id == GetUserId())
+                    return BadRequest("You cannot delete your own user");
+                var res = _userService.Delete(id);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

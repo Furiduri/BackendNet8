@@ -1,7 +1,7 @@
 ﻿using GCatcode.Api.Core.Auth;
+using GCatcode.Repository.DB.RolServices;
 using GCatcode.Repository.DB.UserRolServices;
 using GCatcode.Repository.DB.UserServices;
-using GCatcode.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,8 +15,8 @@ namespace GCatcode.Api.Core
     [Route("api/[controller]")]
     public class AuthController : BaseController
     {
-        public AuthController(IConfiguration configuration)
-            : base(configuration)
+        public AuthController(IConfiguration configuration, IUserService userService, IUserRolService userRolService)
+            : base(configuration, userService, userRolService)
         {
         }
 
@@ -25,31 +25,40 @@ namespace GCatcode.Api.Core
         public IActionResult GetUserInfo()
         {
             int userId = GetUserId();
+            var user = _userService.GetById(userId);
+            if (user == null)
+                return NotFound();
 
-            return Ok(new {
-                email = "",
-                username = "",
-                id = userId
+            return Ok(new Response<object>
+            {
+                Data = new
+                {
+                    email = user.Email,
+                    username = user.UserName,
+                    id = userId,
+                    roles = GetRoles().Select(r => r.Name)
+                }
             });
         }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin user)
         {
-
-            var service = new UserService(_connection);
-            UserDTO userDto = service.GetByUserName(user.Username);
+            UserDTO userDto = _userService.GetByUserName(user.Username);
             if (userDto == null)
             {
                 return Unauthorized();
             }
-            if (service.ValidPassword(user))
+
+            if (_userService.ValidPassword(user))
             {
-                
-                var token = GenerateJwtToken(userDto);
-                return Ok(new Response<LoginResponse> {
-                    Msg = "Ok",                    
-                    Data = new LoginResponse {
+                var roles = _userRolService.GetRolsByUserId(userDto.UserId).ToList();
+                var token = GenerateJwtToken(userDto, roles);
+                return Ok(new Response<LoginResponse>
+                {
+                    Msg = "Ok",
+                    Data = new LoginResponse
+                    {
                         Token = token,
                         User = userDto
                     }
@@ -60,37 +69,38 @@ namespace GCatcode.Api.Core
 
         [HttpPost("register")]
         public IActionResult Register([FromBody] UserInsert user)
-        {            
-            using (var transaction = _connection.BeginTransaction())
-            {
-                try
-                {
-                    var service = new UserService(_connection, transaction);
-                    var userCreated = service.Add(user);
-                    if(userCreated == null)
-                    {
-                        return BadRequest("User creation failed.");
-                    }
-
-                    var token = GenerateJwtToken(userCreated);
-                    return Ok(new { token });
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    return BadRequest(ex.Message);
-                }
-            }
-        }  
-
-        private string GenerateJwtToken(UserDTO user)
         {
-            var claims = new[]
+            try
+            {
+                var userCreated = _userService.Add(user);
+                if (userCreated == null)
+                {
+                    return BadRequest("User creation failed.");
+                }
+
+                var roles = _userRolService.GetRolsByUserId(userCreated.UserId).ToList();
+                var token = GenerateJwtToken(userCreated, roles);
+                return Ok(new { token });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        private string GenerateJwtToken(UserDTO user, List<RolItem> roles)
+        {
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

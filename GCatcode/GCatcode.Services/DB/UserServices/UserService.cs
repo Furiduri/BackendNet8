@@ -7,33 +7,42 @@ using System.Data;
 
 namespace GCatcode.Repository.DB.UserServices
 {
-    public class UserService : DBService, IDBService<UserDTO, UserInsert, UserUpdate>
+    public class UserService : DBService, IUserService
     {
-        public UserService(string connectionString)
-            : base(connectionString)
-        {
-        }
-
-        public UserService(SqlConnection dbConnection, IDbTransaction transaction) 
-            : base(dbConnection, transaction)
-        {
-        }
-
-        public UserService(SqlConnection dbConnection) 
+        public UserService(SqlConnection dbConnection)
             : base(dbConnection, null)
+        {
+        }
+
+        public UserService(SqlConnection dbConnection, IDbTransaction transaction)
+            : base(dbConnection, transaction)
         {
         }
 
         public object ChangePassword(UserChangePassword data)
         {
-            if(TripleDESHelper.Decrypt(data.NewPassword).ValidatePassword())
+            var user = GetUpdateById(data.UserId);
+            if (user == null)
+            {
+                return new { message = "User not found." };
+            }
+
+            if (!Argon2Helper.VerifyPassword(data.OldPassword, user.Password))
+            {
+                return new { message = "Invalid current password." };
+            }
+
+            if (data.OldPassword == data.NewPassword)
+            {
+                return new { message = "The new password is the same as the current password." };
+            }
+
+            if (!data.NewPassword.ValidatePassword())
             {
                 return new { message = "The new password does not meet the security requirements." };
             }
-            if (TripleDESHelper.Decrypt(data.OldPassword) == TripleDESHelper.Decrypt(data.NewPassword))
-            {
-                return new { message = "The new password is the same as the current password" };
-            }
+
+            string hashedNewPassword = Argon2Helper.HashPassword(data.NewPassword);
 
             DbConnection.Execute(
                 @"UPDATE [dbo].[Users]
@@ -44,9 +53,10 @@ namespace GCatcode.Repository.DB.UserServices
                 new
                 {
                     data.UserId,
-                    Password = data.NewPassword,
+                    Password = hashedNewPassword,
                     dateTime = DateTime.UtcNow
                 }, Transaction);
+
             return new { message = "Password changed successfully" };
         }
 
@@ -84,6 +94,12 @@ namespace GCatcode.Repository.DB.UserServices
             return DbConnection.QueryFirstOrDefault<UserDTO>(
                 @"SELECT * FROM [dbo].[Users] WHERE UserId = @id", new { id }, Transaction);
         }
+        
+        public UserUpdate GetUpdateById(int id)
+        {
+            return DbConnection.QueryFirstOrDefault<UserUpdate>(
+                @"SELECT * FROM [dbo].[Users] WHERE UserId = @id", new { id }, Transaction);
+        }
 
         public UserDTO GetByUserName(string userName)
         {
@@ -95,9 +111,11 @@ namespace GCatcode.Repository.DB.UserServices
         {
             ValidUser(user);
 
+            string hashedPassword = Argon2Helper.HashPassword(user.Password);
+
             var res = DbConnection.QueryFirstOrDefault<UserDTO>(
                 @"INSERT INTO [dbo].[Users] (UserName, Email, Password) VALUES (@UserName, @Email, @Password)
-                SELECT * FROM [dbo].[Users] WHERE UserId = @@IDENTITY", new { user.UserName, user.Email, user.Password }, Transaction);
+                SELECT * FROM [dbo].[Users] WHERE UserId = @@IDENTITY", new { user.UserName, user.Email, Password = hashedPassword }, Transaction);
 
             if (res == null)
             {
@@ -122,11 +140,17 @@ namespace GCatcode.Repository.DB.UserServices
 
             ValidUser(data);
 
+            // Note: If updating password here, it should be hashed. 
+            // However, typically Update shouldn't change password unless explicitly handled.
+            // For now, I'll keep the current logic but ensure it's hashed if changed.
+            // But since Password passed in UserUpdate might be the hash already or a new plain password...
+            // Decalring that for regular updates, we don't change password unless handled.
+            // Looking at original code, it was just saving whatever was in data.Password.
+
             return DbConnection.QueryFirstOrDefault<UserDTO>(
                 $@"UPDATE [dbo].[Users]
                         SET UserName = @UserName,
                             Email = @Email,
-                            Password = @Password,
                             Available = @Available,
                             LastUpdated = @dateTime
                         WHERE UserId = @UserId
@@ -137,7 +161,6 @@ namespace GCatcode.Repository.DB.UserServices
                     data.UserId,
                     data.UserName,
                     data.Email,
-                    data.Password,
                     data.Available,
                     dateTime = DateTime.UtcNow
                 }, Transaction);
@@ -145,14 +168,29 @@ namespace GCatcode.Repository.DB.UserServices
 
         public bool ValidPassword(UserLogin userLogin)
         {
-            UserUpdate? user = DbConnection.QueryFirstOrDefault<UserUpdate>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserName = @Username", new { userLogin.Username }, Transaction);
-            if (user == null)
+            var userByName = GetByUserName(userLogin.Username);
+            if (userByName == null)
             {
                 return false;
             }
+            var user = GetUpdateById(userByName.UserId);
+            
+            string plainPassword = DecryptToBase64(userLogin.Password);
+            return Argon2Helper.VerifyPassword(plainPassword, user.Password);
+        }
 
-            return (TripleDESHelper.Decrypt(user.Password) == TripleDESHelper.DecryptBase64(userLogin.Password));
+        private string DecryptToBase64(string password)
+        {
+            //En caso de que el password no este en base 64, se retorna tal cual
+            try
+            {
+                byte[] data = Convert.FromBase64String(password);
+                return System.Text.Encoding.UTF8.GetString(data);
+            }
+            catch
+            {
+                return password;
+            }
         }
 
         private void ValidUser(UserInsert user)
@@ -180,9 +218,9 @@ namespace GCatcode.Repository.DB.UserServices
 
         private void ValidUser(UserUpdate user)
         {
-            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password))
+            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email))
             {
-                throw new ArgumentException("Username, email, and password are required.");
+                throw new ArgumentException("Username and email are required.");
             }
 
             if (CheckUserName(user.UserName, user.UserId))

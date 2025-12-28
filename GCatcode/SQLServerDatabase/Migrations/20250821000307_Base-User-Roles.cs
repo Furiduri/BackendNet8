@@ -90,10 +90,10 @@ namespace GCatcode.SQLServerDatabase.Migrations
                 columns: new[] { "UserId", "UserName", "Email", "Password" },
                 values: new object[,]
                 {
-                    {0, "Dev", null ,  Utils.TripleDESHelper.Encrypt("Dev12345") },
-                    {1, "Guest", null , Utils.TripleDESHelper.Encrypt("Gest12345") },
-                    {2, "User", null , Utils.TripleDESHelper.Encrypt("User12345") },
-                    {3, "Admin", null , Utils.TripleDESHelper.Encrypt("Admin12345") }
+                    {0, "Dev", null ,  Utils.Argon2Helper.HashPassword("Dev12345") },
+                    {1, "Guest", null , Utils.Argon2Helper.HashPassword("Gest12345") },
+                    {2, "User", null , Utils.Argon2Helper.HashPassword("User12345") },
+                    {3, "Admin", null , Utils.Argon2Helper.HashPassword("Admin12345") }
             });
 
             migrationBuilder.InsertData(

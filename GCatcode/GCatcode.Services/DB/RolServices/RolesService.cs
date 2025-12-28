@@ -5,20 +5,15 @@ using System.Data;
 
 namespace GCatcode.Repository.DB.RolServices
 {
-    public class RolesService : DBService, IDBService<RolDTO, RolInsert, RolUpdate>
+    public class RolesService : DBService, IRolesService
     {
-        public RolesService(string connectionString)
-            : base(connectionString)
+        public RolesService(SqlConnection sqlConnection)
+            : base(sqlConnection, null)
         {
         }
 
         public RolesService(SqlConnection sqlConnection, IDbTransaction transaction)
             : base(sqlConnection, transaction)
-        {
-        }
-
-        public RolesService(SqlConnection sqlConnection)
-            : base(sqlConnection, null)
         {
         }
 

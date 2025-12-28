@@ -10,7 +10,6 @@ import {
 } from '@/modules/UserAccount/api'
 import { changeLocale } from '@/locales/useLocale'
 import { DEFAULT_LANG } from '@/locales/config'
-import { toBase64Unicode } from '@/utils/stringUtils'
 
 export interface IUserAccountState {
   locale: string
@@ -27,10 +26,21 @@ export const useUserAccountStore = defineStore('UserAccount', {
     }
   },
   getters: {
-    // demoList: state => state.demoList
+    isAdmin(state) {
+      const roles = state.userInfo?.roles || state.userInfo?.Roles
+      return roles?.includes('Admin') || roles?.includes('Developer')
+    },
+    isDeveloper(state) {
+      const roles = state.userInfo?.roles || state.userInfo?.Roles
+      return roles?.includes('Developer')
+    },
+    isAdminOrDev(state) {
+      const roles = state.userInfo?.roles || state.userInfo?.Roles
+      return roles?.includes('Admin') || roles?.includes('Developer')
+    }
   },
   actions: {
-    async GetModuleTestList (params) {
+    async GetModuleTestList(params) {
       // TODO: 模拟响应时间
       await sleep(1000)
       // TODO: 模拟 api
@@ -41,22 +51,32 @@ export const useUserAccountStore = defineStore('UserAccount', {
       this.demoList = result
       return result
     },
-    async updateChangeLanguage (params) {
+    async updateChangeLanguage(params) {
       const result = await updateChangeLanguage(params)
       return this.filterResponse(result)
     },
-    setLanguage (data) {
+    setLanguage(data) {
       this.locale = data.locale
     },
-    async login (data) {
-      const res = await login({ username: data.username, password: toBase64Unicode( data.password ) })
-      return this.filterResponse(res, null, () => {})
+    async login(data) {
+      const res = await login({ username: data.username, password: data.password })
+      return this.filterResponse(res, ({ data }) => {
+        if (data && data.user) {
+          // Normalizar datos para evitar problemas de casing
+          this.userInfo = {
+            username: data.user.userName || data.user.username,
+            email: data.user.email || data.user.Email,
+            userId: data.user.userId || data.user.UserId,
+            roles: data.user.roles || data.user.Roles || []
+          }
+        }
+      })
     },
-    async logout () {
+    async logout() {
       const res = await logout()
-      return this.filterResponse(res, null, () => {})
+      return this.filterResponse(res, null, () => { })
     },
-    async getUserInfo () {
+    async getUserInfo() {
       const res = await getUserInfoData()
       return this.filterResponse(res, ({ data }) => {
         this.userInfo = data

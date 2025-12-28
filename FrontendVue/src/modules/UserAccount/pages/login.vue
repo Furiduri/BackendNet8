@@ -71,11 +71,10 @@ export default defineComponent({
     const router = useRouter()
 
     const isLoading = ref(true)
-    // const inputErrorEmail = ref('')
     const inputErrorPassword = ref('')
     const formData = reactive({
-      username: 'Dev',
-      password: 'Dev12345.'
+      username: '',
+      password: ''
     })
 
     const localeInject = useI18n()
@@ -172,7 +171,7 @@ export default defineComponent({
 
         Cookie.set('token', data!.token)
         router
-          .replace(`/${ route.params.locale || '' }`)
+          .replace({ name: 'Home' })
           .then(() => {
             ElMessage({
               type: 'success',

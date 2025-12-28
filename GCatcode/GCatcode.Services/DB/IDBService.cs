@@ -1,6 +1,6 @@
 ﻿namespace GCatcode.Repository.DB
 {
-    internal interface IDBService<Table, TInsert, TUpdate>
+    public interface IDBService<Table, TInsert, TUpdate>
     {
         Table? GetById(int id);
 

@@ -1,4 +1,6 @@
 using GCatcode.Api.Core;
+using GCatcode.Repository.DB.UserRolServices;
+using GCatcode.Repository.DB.UserServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Controllers
@@ -6,8 +8,8 @@ namespace GCatcode.Api.Controllers
     [ApiController, Route("api/[controller]")]
     public class TestController : BaseController
     {
-        public TestController(IConfiguration configuration)
-            : base(configuration)
+        public TestController(IConfiguration configuration, IUserService userService, IUserRolService userRolService)
+            : base(configuration, userService, userRolService)
         {
         }
 

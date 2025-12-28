@@ -1,34 +1,25 @@
 import { IResponse, IUser } from '@/interfaces/IAll'
 import { DEFAULT_LANG } from '@/locales/config'
 import request from '@/utils/request'
+import { toBase64Unicode } from '@/utils/stringUtils'
 
-export function login (data : { username: string, password: string }) : Promise<IResponse<{
+export function login(data: { username: string, password: string }): Promise<IResponse<{
   language: string;
   token: string;
   user: IUser;
 }>> {
+  data.password = toBase64Unicode(data.password)
   return request({
     url: 'Auth/login',
     method: 'post',
-    data
+    data: {
+      username: data.username,
+      password: data.password
+    }
   })
-
-  // return {
-  //   error: 0,
-  //   msg: 'OK',
-  //   data: {
-  //     language: DEFAULT_LANG,
-  //     user: {
-  //       email: 'admin@org.com',
-  //       username: '管理员',
-  //       id: '601d85900f43923hffbcs',
-  //       token: '4v8acea-6a89-2a2ebc-10802-9ac19003'
-  //     }
-  //   }
-  // }
 }
 
-export function logout () {
+export function logout() {
   return request({
     url: '/logout',
     method: 'post'
@@ -36,27 +27,14 @@ export function logout () {
 }
 
 export function getUserInfoData(params = {}) {
-  // return request({
-  //   url: '/user_info',
-  //   method: 'get',
-  //   params
-  // })
-  return {
-    error: 0,
-    msg: 'OK',
-    data: {
-      language: DEFAULT_LANG,
-      user: {
-        email: 'admin@org.com',
-        username: '管理员',
-        id: '601d85900f43923hffbcs',
-        token: '4v8acea-6a89-2a2ebc-10802-9ac19003'
-      }
-    }
-  }
+  return request({
+    url: 'Auth/user_info',
+    method: 'get',
+    params
+  })
 }
 
-export function updateChangeLanguage (data) {
+export function updateChangeLanguage(data) {
   return request({
     url: '/acl/changelanguage',
     method: 'post',
@@ -64,7 +42,7 @@ export function updateChangeLanguage (data) {
   })
 }
 
-export function getDemoTestList (params) {
+export function getDemoTestList(params) {
   return request({
     url: '/api/demo_test/list',
     method: 'get',
@@ -72,7 +50,7 @@ export function getDemoTestList (params) {
   })
 }
 
-export function createDemoTest (data) {
+export function createDemoTest(data) {
   return request({
     url: '/api/demo_test',
     method: 'post',
@@ -80,17 +58,17 @@ export function createDemoTest (data) {
   })
 }
 
-export function updateDemoTest (data) {
+export function updateDemoTest(data) {
   return request({
-    url: `/api/demo_test/${ data.demoId }`,
+    url: `/api/demo_test/${data.demoId}`,
     method: 'put',
     data
   })
 }
 
-export function deleteDemoTest (demoId) {
+export function deleteDemoTest(demoId) {
   return request({
-    url: `/api/demo_test/${ demoId }`,
+    url: `/api/demo_test/${demoId}`,
     method: 'delete'
   })
 }

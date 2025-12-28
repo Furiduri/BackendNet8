@@ -6,7 +6,7 @@ import Cookie from 'js-cookie'
 import { useOutsideRouter } from '@/store/hooks/useOutsideRouter'
 
 // redirect error
-function errorRedirect (url: string) {
+function errorRedirect(url: string) {
   const { router } = useOutsideRouter()
   router.push(url)
 }
@@ -89,7 +89,7 @@ service.interceptors.request.use(
 
     Object.defineProperty(request.headers, 'Authorization', {
       enumerable: true,
-      value: token as string
+      value: token ? `Bearer ${token}` : ''
     })
 
     return request
@@ -148,9 +148,9 @@ service.interceptors.response.use(
      * the frontend should return a constructed data structure to avoid business logic errors.
      * Interfaces that do not require redirection do not need to pass this field.
      */
-    if(import.meta.env.DEV)
+    if (import.meta.env.DEV)
       console.error('err' + error) // for debug
-    if (error.config.redirect) {
+    if (error.config?.redirect) {
       errorRedirect(error.config.redirect)
     }
     if (error.response) {
@@ -170,7 +170,7 @@ service.interceptors.response.use(
   }
 )
 
-export function sleep (time = 0) {
+export function sleep(time = 0) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({})
@@ -178,7 +178,7 @@ export function sleep (time = 0) {
   })
 }
 
-function extractFileNameFromContentDispositionHeader (value: string) {
+function extractFileNameFromContentDispositionHeader(value: string) {
   const patterns = [
     /filename\*=[^']+'\w*'"([^"]+)";?/i,
     /filename\*=[^']+'\w*'([^;]+);?/i,
@@ -202,7 +202,7 @@ function extractFileNameFromContentDispositionHeader (value: string) {
   return null
 }
 
-export function downloadFile (boldData: any, filename = 'test-filename', type: string) {
+export function downloadFile(boldData: any, filename = 'test-filename', type: string) {
   // TODO: https://blog.csdn.net/weixin_42142057/article/details/97655591
   const blob = boldData instanceof Blob
     ? boldData
@@ -222,7 +222,7 @@ export function downloadFile (boldData: any, filename = 'test-filename', type: s
   document.body.removeChild(link)
 }
 
-export function useResHeadersAPI (headers: any, resData: any) {
+export function useResHeadersAPI(headers: any, resData: any) {
   const disposition = headers['content-disposition']
   if (disposition) {
     let filename: any = ''
