@@ -1,0 +1,12 @@
+{
+    "welcome": "Bienvenido a web-app",
+    "language": "Idioma",
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "auth": {
+        "logout": "Cerrar sesión",
+        "login": "Iniciar sesión",
+        "register": "Registrarse"
+    }
+}
