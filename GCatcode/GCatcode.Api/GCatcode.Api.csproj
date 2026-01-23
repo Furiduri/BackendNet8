@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GCatcode.DataBase\GCatcode.DataBase.csproj" />
     <ProjectReference Include="..\GCatcode.Services\GCatcode.Repository.csproj" />
-    <ProjectReference Include="..\SQLServerDatabase\GCatcode.SQLServerDatabase.csproj" />
     <ProjectReference Include="..\Utils\GCatcode.Utils.csproj" />
   </ItemGroup>
 
