@@ -21,6 +21,9 @@ namespace GCatcode.Repository.DB.UserServices
 
         public object ChangePassword(UserChangePassword data)
         {
+            data.OldPassword = DecryptToBase64(data.OldPassword);
+            data.NewPassword = DecryptToBase64(data.NewPassword);
+
             var user = GetUpdateById(data.UserId);
             if (user == null)
             {
@@ -112,7 +115,7 @@ namespace GCatcode.Repository.DB.UserServices
         public UserDTO Add(UserInsert user)
         {
             ValidUser(user);
-
+            user.Password = DecryptToBase64(user.Password);
             string hashedPassword = Argon2Helper.HashPassword(user.Password);
 
             var res = DbConnection.QueryFirstOrDefault<UserDTO>(
@@ -170,6 +173,7 @@ namespace GCatcode.Repository.DB.UserServices
 
         public bool ValidPassword(UserLogin userLogin)
         {
+            userLogin.Password = DecryptToBase64(userLogin.Password);
             var userByName = GetByUserName(userLogin.Username);
             if (userByName == null)
             {
@@ -177,8 +181,7 @@ namespace GCatcode.Repository.DB.UserServices
             }
             var user = GetUpdateById(userByName.UserId);
 
-            string plainPassword = DecryptToBase64(userLogin.Password);
-            return Argon2Helper.VerifyPassword(plainPassword, user.Password);
+            return Argon2Helper.VerifyPassword(userLogin.Password, user.Password);
         }
 
         private string DecryptToBase64(string password)

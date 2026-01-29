@@ -27,6 +27,7 @@ namespace GCatcode.Api.Controllers.Roles
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
+                context.Open();
                 var transaction = context.BeginTransaction();
                 var service = new RolesService(context, transaction);
                 var role = service.GetById(data.RolId);
@@ -55,6 +56,7 @@ namespace GCatcode.Api.Controllers.Roles
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
+                context.Open();
                 var transaction = context.BeginTransaction();
                 var service = new RolesService(context, transaction);
                 var role = service.GetById(id);

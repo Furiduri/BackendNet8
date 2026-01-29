@@ -14,7 +14,7 @@ namespace GCatcode.Api.Core.Auth
         public AuthController(AppSettings configuration)
             : base(configuration)
         {
-            _methods = new AuthMethods(configuration);
+            _methods = new AuthMethods(configuration);            
         }
 
         [Authorize]
@@ -40,6 +40,11 @@ namespace GCatcode.Api.Core.Auth
             }
         }
 
+        /// <summary>
+        /// Login user and generate JWT token
+        /// </summary>
+        /// <param name="user">user and Password in string Base64</param>
+        /// <returns>JWT token</returns>
         [HttpPost("login")]
         public ActionResult Login([FromBody] UserLogin user)
         {
@@ -62,6 +67,11 @@ namespace GCatcode.Api.Core.Auth
             }
         }
 
+        /// <summary>
+        /// Register New User
+        /// </summary>
+        /// <param name="user"> UserName, email and Password in string Base64</param>
+        /// <returns>JWT token</returns>
         [HttpPost("register")]
         public IActionResult Register([FromBody] UserInsert user)
         {

@@ -35,7 +35,7 @@ namespace GCatcode.Api.Core.Auth
                     email = userInfo.Email,
                     username = userInfo.UserName,
                     id = userId,
-                    roles = roles.Select(r => r.Name)
+                    roles = roles
                 });
             }
         }
@@ -60,7 +60,7 @@ namespace GCatcode.Api.Core.Auth
                     {
                         Token = token,
                         User = userinfo,
-                    });
+                    }, "Login Succes");
                 }
                 return ApiResponse.ErrorResult(System.Net.HttpStatusCode.Unauthorized, ResponseMessageCommon.InvalidCredentials.ToMsgString());
             }
@@ -70,6 +70,7 @@ namespace GCatcode.Api.Core.Auth
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
+                context.Open();
                 var transaction = context.BeginTransaction();
                 var userCreated = new UserService(context, transaction).Add(user);
                 if (userCreated == null)

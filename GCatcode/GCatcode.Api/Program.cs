@@ -23,6 +23,7 @@ var appSettingsConfig = builder.Configuration
     .Get<AppSettings>() ?? new AppSettings();
 
 appSettingsConfig.DB = connectionStrings;
+appSettingsConfig.JwtSettings = jwtSettings;
 
 builder.Services.AddSingleton(appSettingsConfig);
 

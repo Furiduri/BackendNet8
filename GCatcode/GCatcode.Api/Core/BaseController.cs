@@ -1,7 +1,6 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Repository.DB.RolServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using System.Security.Claims;
 
 namespace GCatcode.Api.Core
@@ -15,8 +14,7 @@ namespace GCatcode.Api.Core
             _configuration = configuration;
         }
 
-        protected bool IsAdmin => User.Claims.Any(c => c.Type == ClaimTypes.Role &&
-            (c.Value == RolesType.Admin.ToString() || c.Value == RolesType.Developer.ToString()));
+        protected bool IsAdmin => GetRoles()?.Any(c => c == RolesType.Admin.ToString() || c == RolesType.Dev.ToString()) ?? false;
 
         private string UserName { get; set; }
 
@@ -35,7 +33,7 @@ namespace GCatcode.Api.Core
         [NonAction]
         protected int GetUserId()
         {
-            if (UserId < 1)
+            if (UserId == null)
             {
                 var claim = User.FindFirst(ClaimTypes.NameIdentifier);
                 UserId = claim != null ? int.Parse(claim.Value) : -1;
@@ -43,13 +41,17 @@ namespace GCatcode.Api.Core
             return UserId.Value;
         }
 
+        private IEnumerable<string> Roles;
+
         [NonAction]
-        protected IEnumerable<RolItem> GetRoles()
+        protected IEnumerable<string> GetRoles()
         {
-            using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
+            if (Roles == null)
             {
-                return new RolesService(context).GetRolesByUserId(GetUserId());
+                var claims = User.FindAll(ClaimTypes.Role);
+                Roles = claims.Select(x => x.Value);
             }
+            return Roles;
         }
 
         [NonAction]

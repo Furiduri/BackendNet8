@@ -59,6 +59,7 @@ namespace GCatcode.Api.Controllers.Users
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
+                context.Open();
                 var transaction = context.BeginTransaction();
                 var userService = new UserService(context, transaction);
                 var userDto = userService.Add(data);
@@ -75,6 +76,7 @@ namespace GCatcode.Api.Controllers.Users
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
+                context.Open();
                 var transaction = context.BeginTransaction();
                 var userService = new UserService(context, transaction);
                 var existingUser = userService.GetById(data.UserId);
@@ -92,6 +94,7 @@ namespace GCatcode.Api.Controllers.Users
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
+                context.Open();
                 var transaction = context.BeginTransaction();
                 var userService = new UserService(context, transaction);
                 var existingUser = userService.GetById(data.UserId);
@@ -109,6 +112,7 @@ namespace GCatcode.Api.Controllers.Users
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
+                context.Open();
                 var transaction = context.BeginTransaction();
                 var userService = new UserService(context, transaction);
                 var existingUser = userService.GetById(userId);

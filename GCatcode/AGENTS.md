@@ -2,10 +2,10 @@
 
 ## 📋 Información del Proyecto
 
-**Nombre del Proyecto:** GCatcode Backend API  
-**Framework:** ASP.NET Core 8.0  
-**Tipo:** Web API RESTful  
-**Repositorio:** https://github.com/Furiduri/BackendNet8  
+**Nombre del Proyecto:** GCatcode Backend API
+**Framework:** ASP.NET Core 8.0
+**Tipo:** Web API RESTful
+**Repositorio:** [Github - BackendNet8](https://github.com/Furiduri/BackendNet8)
 **Rama Principal:** main
 **Rama Develop**: develop
 **Autor:** Jorge Perez - Gcatcode
