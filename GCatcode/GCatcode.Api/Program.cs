@@ -1,15 +1,43 @@
-using GCatcode.SQLServerDatabase;
+using GCatcode.Api.Configuration;
+using GCatcode.DataBase;
+using GCatcode.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- Configuration binding ---
+var connectionStrings = builder.Configuration
+    .GetSection("ConnectionStrings")
+    .Get<ConnectionStrings>() ?? new ConnectionStrings();
+
+var jwtSettings = builder.Configuration
+    .GetSection("Jwt")
+    .Get<JwtSettings>() ?? new JwtSettings();
+
+var appSettingsConfig = builder.Configuration
+    .GetSection("AppSettings")
+    .Get<AppSettings>() ?? new AppSettings();
+
+appSettingsConfig.DB = connectionStrings;
+appSettingsConfig.JwtSettings = jwtSettings;
+
+builder.Services.AddSingleton(appSettingsConfig);
+
 // Add DbContext
 builder.Services.AddDbContext<AppDBContext>(dbContext =>
 {
     dbContext.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+// Register Dapper/SQL Connection
+builder.Services.AddScoped<SqlConnection>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    return Settings.GetSqlDBConnection(config);
 });
 
 builder.Services.AddCors(options =>
@@ -43,6 +71,19 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// --- CORS ---
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", corsBuilder =>
+    {
+        corsBuilder.WithOrigins(
+            "http://localhost:5173",
+            "https://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -50,11 +91,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();    
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-app.UseCors("MyAllowSpecificOrigins"); // Apply the named policy here
 app.UseAuthentication();
 app.UseAuthorization();
 

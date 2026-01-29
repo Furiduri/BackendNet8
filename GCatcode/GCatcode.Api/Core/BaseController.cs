@@ -1,71 +1,63 @@
-﻿using GCatcode.Repository.DB.RolServices;
-using GCatcode.Repository.DB.UserRolServices;
-using GCatcode.Utils;
+﻿using GCatcode.Api.Configuration;
+using GCatcode.Repository.DB.RolServices;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using System.Security.Claims;
 
 namespace GCatcode.Api.Core
 {
     public class BaseController : ControllerBase
     {
-        public class Response<T>
+        protected readonly AppSettings _configuration;
+
+        public BaseController(AppSettings configuration)
         {
-            public T Data { get; set; }
-            public string Msg { get; set; }
-
-            /// <summary>
-            /// 0 success | 1 error | 5000 failed | HTTP code
-            /// </summary>
-            public int Error { get; set; } = 0;
-        }
-        protected readonly IConfiguration _configuration;
-        protected readonly SqlConnection _connection;
-        public BaseController(IConfiguration configuration)
-        { _configuration = configuration;
-          _connection = Settings.GetSqlDBConnection(_configuration);
+            _configuration = configuration;
         }
 
-        protected bool IsAdmin => GetRoles().Exists(x => x.RolId == (int)RolesType.Admin || x.RolId == (int)RolesType.Developer);
-        
+        protected bool IsAdmin => GetRoles()?.Any(c => c == RolesType.Admin.ToString() || c == RolesType.Dev.ToString()) ?? false;
+
+        private string UserName { get; set; }
+
         [NonAction]
         protected string GetUserName()
         {
-            try
+            if (string.IsNullOrEmpty(UserName))
             {
-                return User.FindFirst(ClaimTypes.Name).Value;
+                UserName = User.FindFirstValue(ClaimTypes.Name);
             }
-            catch (Exception)
-            {
-                return null;
-            }
+            return UserName;
         }
+
+        private int? UserId { get; set; }
 
         [NonAction]
         protected int GetUserId()
         {
-            try
+            if (UserId == null)
             {
-                return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+                UserId = claim != null ? int.Parse(claim.Value) : -1;
             }
-            catch (Exception)
+            return UserId.Value;
+        }
+
+        private IEnumerable<string> Roles;
+
+        [NonAction]
+        protected IEnumerable<string> GetRoles()
+        {
+            if (Roles == null)
             {
-                return -1;
+                var claims = User.FindAll(ClaimTypes.Role);
+                Roles = claims.Select(x => x.Value);
             }
+            return Roles;
         }
 
         [NonAction]
-        protected List<RolItem> GetRoles()
+        protected void LogError(Exception ex)
         {
-            try
-            {
-                var userRolService = new UserRolService(_connection);
-                return userRolService.GetRolsByUserId(GetUserId()).ToList();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            // Implement logging logic here, e.g., write in database log
         }
     }
 }

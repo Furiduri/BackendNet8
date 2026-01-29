@@ -5,10 +5,10 @@ using System.Data;
 
 namespace GCatcode.Repository.DB.RolServices
 {
-    public class RolesService : DBService, IDBService<RolDTO, RolInsert, RolUpdate>
+    public class RolesService : DBService
     {
-        public RolesService(string connectionString)
-            : base(connectionString)
+        public RolesService(SqlConnection sqlConnection)
+            : base(sqlConnection, null)
         {
         }
 
@@ -17,19 +17,18 @@ namespace GCatcode.Repository.DB.RolServices
         {
         }
 
-        public RolesService(SqlConnection sqlConnection)
-            : base(sqlConnection, null)
-        {
-        }
-
         public RolDTO? GetById(int id)
         {
             return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[Roles] WHERE RolId = @id", new { id }, Transaction);
         }
 
-        public IEnumerable<RolDTO> Get(int maxItems = 100, int page = 1, object? filters = null)
+        public IEnumerable<RolDTO> Get(int page = 1, RolFilter? filters = null, int maxItems = 100)
         {
-            return DbConnection.Query<RolDTO>($@"SELECT TOP {maxItems} * FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters, Transaction);
+            return DbConnection.Query<RolDTO>($@"SELECT *
+                    FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}
+                    ORDER BY RolId
+                    OFFSET {((page - 1) * maxItems)} ROWS"
+                    , filters, Transaction);
         }
 
         public RolDTO Delete(int id)
@@ -82,6 +81,16 @@ namespace GCatcode.Repository.DB.RolServices
                     data.Name,
                     data.Description
                 }, Transaction);
+        }
+
+        public IEnumerable<RolItem> GetRolesByUserId(int userId)
+        {
+            return DbConnection.Query<RolItem>($@"
+                    SELECT r.*
+                    FROM [dbo].[Roles] r
+                    INNER JOIN [dbo].[UserRoles] ur ON r.RolId = ur.RolId
+                    WHERE ur.UserId = @userId
+                    ", new { userId }, Transaction);
         }
     }
 }

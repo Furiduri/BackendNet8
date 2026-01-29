@@ -12,7 +12,8 @@ namespace GCatcode.Utils
                 PropertyInfo[] propiedades = filters.GetType().GetProperties();
                 foreach (var prop in propiedades)
                 {
-                    were += $" AND {prop.Name} = @{prop.Name} ";
+                    if (prop.GetValue(filters) != null)
+                        were += $" AND {prop.Name} = @{prop.Name} ";
                 }
             }
             return were;
