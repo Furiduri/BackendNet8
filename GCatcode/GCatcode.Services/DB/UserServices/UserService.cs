@@ -7,7 +7,7 @@ using System.Data;
 
 namespace GCatcode.Repository.DB.UserServices
 {
-    public class UserService : DBService, IUserService
+    public class UserService : DBService
     {
         public UserService(SqlConnection dbConnection)
             : base(dbConnection, null)
@@ -83,10 +83,12 @@ namespace GCatcode.Repository.DB.UserServices
                 }, Transaction);
         }
 
-        public IEnumerable<UserDTO> Get(int maxItems = 100, int page = 1, object filters = null)
+        public IEnumerable<UserDTO> Get(int maxItems = 100, int page = 1, UserFilter filters = null)
         {
             return DbConnection.Query<UserDTO>(
-                $@"SELECT TOP {maxItems} * FROM [dbo].[Users] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}", filters, Transaction);
+                $@"SELECT * FROM [dbo].[Users] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}
+                    Order By UserId OFFSET {(page - 1) * maxItems} ROWS FETCH NEXT {maxItems} ROWS ONLY",
+                filters, Transaction);
         }
 
         public UserDTO GetById(int id)
@@ -94,7 +96,7 @@ namespace GCatcode.Repository.DB.UserServices
             return DbConnection.QueryFirstOrDefault<UserDTO>(
                 @"SELECT * FROM [dbo].[Users] WHERE UserId = @id", new { id }, Transaction);
         }
-        
+
         public UserUpdate GetUpdateById(int id)
         {
             return DbConnection.QueryFirstOrDefault<UserUpdate>(
@@ -140,7 +142,7 @@ namespace GCatcode.Repository.DB.UserServices
 
             ValidUser(data);
 
-            // Note: If updating password here, it should be hashed. 
+            // Note: If updating password here, it should be hashed.
             // However, typically Update shouldn't change password unless explicitly handled.
             // For now, I'll keep the current logic but ensure it's hashed if changed.
             // But since Password passed in UserUpdate might be the hash already or a new plain password...
@@ -174,7 +176,7 @@ namespace GCatcode.Repository.DB.UserServices
                 return false;
             }
             var user = GetUpdateById(userByName.UserId);
-            
+
             string plainPassword = DecryptToBase64(userLogin.Password);
             return Argon2Helper.VerifyPassword(plainPassword, user.Password);
         }
@@ -232,6 +234,16 @@ namespace GCatcode.Repository.DB.UserServices
             {
                 throw new ArgumentException("Invalid email format.");
             }
+        }
+
+        public IEnumerable<UserItem> Search(string userName, int page)
+        {
+            return DbConnection.Query<UserItem>(
+                $@"SELECT UserId, UserName FROM [dbo].[Users]
+                    WHERE UserName LIKE @userName AND Available = 1
+                    ORDER BY UserName
+                    OFFSET {(page - 1) * 10} ROWS FETCH NEXT 10 ROWS ONLY",
+                new { userName = $"%{userName}%" }, Transaction);
         }
     }
 }

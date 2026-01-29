@@ -5,14 +5,14 @@ using System.Data;
 
 namespace GCatcode.Repository.DB.UserRolServices
 {
-    public class UserRolService : DBService, IUserRolService
+    public class UserRolService : DBService
     {
-        public UserRolService(SqlConnection dbConnection) 
+        public UserRolService(SqlConnection dbConnection)
             : base(dbConnection, null)
         {
         }
 
-        public UserRolService(SqlConnection dbConnection, IDbTransaction transaction) 
+        public UserRolService(SqlConnection dbConnection, IDbTransaction transaction)
             : base(dbConnection, transaction)
         {
         }

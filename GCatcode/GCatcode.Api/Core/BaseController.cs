@@ -1,7 +1,5 @@
-﻿using GCatcode.Repository.DB.RolServices;
-using GCatcode.Repository.DB.UserRolServices;
-using GCatcode.Repository.DB.UserServices;
-using GCatcode.Utils;
+﻿using GCatcode.Api.Configuration;
+using GCatcode.Repository.DB.RolServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Security.Claims;
@@ -10,48 +8,54 @@ namespace GCatcode.Api.Core
 {
     public class BaseController : ControllerBase
     {
-        public class Response<T>
-        {
-            public T Data { get; set; }
-            public string Msg { get; set; }
+        protected readonly AppSettings _configuration;
 
-            /// <summary>
-            /// 0 success | 1 error | 5000 failed | HTTP code
-            /// </summary>
-            public int Error { get; set; } = 0;
-        }
-
-        protected readonly IConfiguration _configuration;
-        protected readonly IUserService _userService;
-        protected readonly IUserRolService _userRolService;
-
-        public BaseController(IConfiguration configuration, IUserService userService, IUserRolService userRolService)
+        public BaseController(AppSettings configuration)
         {
             _configuration = configuration;
-            _userService = userService;
-            _userRolService = userRolService;
         }
 
-        protected bool IsAdmin => User.Claims.Any(c => c.Type == ClaimTypes.Role && 
+        protected bool IsAdmin => User.Claims.Any(c => c.Type == ClaimTypes.Role &&
             (c.Value == RolesType.Admin.ToString() || c.Value == RolesType.Developer.ToString()));
-        
+
+        private string UserName { get; set; }
+
         [NonAction]
         protected string GetUserName()
         {
-            return User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(UserName))
+            {
+                UserName = User.FindFirstValue(ClaimTypes.Name);
+            }
+            return UserName;
         }
+
+        private int? UserId { get; set; }
 
         [NonAction]
         protected int GetUserId()
         {
-            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-            return claim != null ? int.Parse(claim.Value) : -1;
+            if (UserId < 1)
+            {
+                var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+                UserId = claim != null ? int.Parse(claim.Value) : -1;
+            }
+            return UserId.Value;
         }
 
         [NonAction]
-        protected List<RolItem> GetRoles()
+        protected IEnumerable<RolItem> GetRoles()
         {
-            return _userRolService.GetRolsByUserId(GetUserId()).ToList();
+            using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
+            {
+                return new RolesService(context).GetRolesByUserId(GetUserId());
+            }
+        }
+
+        [NonAction]
+        protected void LogError(Exception ex)
+        {
+            // Implement logging logic here, e.g., write in database log
         }
     }
 }

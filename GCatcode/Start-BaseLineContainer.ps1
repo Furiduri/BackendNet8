@@ -1,19 +1,12 @@
-Ôªø# Readme
-
-## Run Docker SQL Server Locally
-
-If container name BaseLine already exists, run this, if not exist create container:
-
-```powershell
 # Verificar si el contenedor existe
 $containerExists = docker ps -a --filter "name=^BaseLine$" --format "{{.Names}}"
 
 if ($containerExists) {
-    # Si existe, verificar si est√° corriendo
+    # Si existe, verificar si est· corriendo
     $containerRunning = docker ps --filter "name=^BaseLine$" --format "{{.Names}}"
     
     if ($containerRunning) {
-        Write-Host "El contenedor 'BaseLine' ya est√° en ejecuci√≥n." -ForegroundColor Green
+        Write-Host "El contenedor 'BaseLine' ya est· en ejecuciÛn." -ForegroundColor Green
     } else {
         Write-Host "Iniciando el contenedor 'BaseLine'..." -ForegroundColor Yellow
         docker start BaseLine
@@ -25,16 +18,10 @@ if ($containerExists) {
     docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=GcatcodeDB2521." -p 1433:1433 --name BaseLine --hostname server_development -d mcr.microsoft.com/mssql/server:2022-latest
     Write-Host "Contenedor 'BaseLine' creado e iniciado correctamente." -ForegroundColor Green
 }
-```
 
-## Run Entity Framework Creation db
-
-```bash
+# Esperar unos segundos para asegurarse de que SQL Server estÈ listo
+Start-Sleep -Seconds 10
+# Ejecutar las migraciones de Entity Framework Core
+Write-Host "Aplicando migraciones de Entity Framework Core..." -ForegroundColor Yellow
 dotnet ef database update --project Gcatcode.DataBase/Gcatcode.DataBase.csproj --startup-project Gcatcode.API/Gcatcode.API.csproj
-```
-
-## Aplly Migrations using Powershell
-
-```bash
-Update-Database -Project Gcatcode.DataBase -StartupProject Gcatcode.Api
-```
+Write-Host "Migraciones aplicadas correctamente." -ForegroundColor Green

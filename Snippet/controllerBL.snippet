@@ -21,75 +21,32 @@
     [ApiController, Route("api/[controller]")]
     public class $ControllerName$Controller : BaseController
     {
-        public $ControllerName$Controller( IConfiguration configuration)
+        private readonly $ControllerName$Methods _methods;
+        public $ControllerName$Controller(AppSettings configuration)
             : base(configuration) 
         {
+            _methods = new $ControllerName$Methods(configuration);
         }
 
         [HttpGet, Route("")]
         public ActionResult<string> Get()
         { 
-            try
+            try{
+                ApiResponse response = _methods.{action}();
+                if (response.Success)
+                {// Retornar 200 OK
+                    return Ok(response);
+                }
+                else
+                {
+                // Retornar 400 Bad Request
+                    return BadRequest(response);
+                }
+            }catch (Exception ex)
             {
-                return Ok("Holi");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }            
-        }
-
-        [HttpGet, Route("{id}")]
-        public ActionResult<int> GetById(int id)
-        {            
-            try
-            {
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPost, Route("")]
-        public ActionResult Post([FromBody] string data)
-        {
-            try
-            {
-                return Ok(data);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-
-        [HttpPut, Route("")]
-        public ActionResult Put([FromBody] string data)
-        {
-            try
-            {
-                return Ok(data);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpDelete, Route("{id}")]
-        public ActionResult Del(int id)
-        {
-            try
-            {
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                LogError(ex);
+                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+            }           
         }
     }
                 ]]>

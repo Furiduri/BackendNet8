@@ -1,7 +1,5 @@
 ﻿using GCatcode.Repository.DB.UserServices;
 using GCatcode.Utils;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 
 namespace TestUnit.Repository
 {
@@ -17,7 +15,7 @@ namespace TestUnit.Repository
         {
             using (var transaction = _connection.BeginTransaction())
             {
-                IUserService userService = new UserService(_connection, transaction);
+                UserService userService = new UserService(_connection, transaction);
                 var users = userService.Get();
                 Assert.IsNotNull(users);
                 Assert.IsTrue(users.Any());
@@ -27,7 +25,7 @@ namespace TestUnit.Repository
         [TestMethod]
         public void TestGetUserById()
         {
-            IUserService userService = new UserService(_connection);
+            UserService userService = new UserService(_connection);
             var user = userService.GetById(1);
             Assert.IsNotNull(user);
         }
@@ -35,7 +33,7 @@ namespace TestUnit.Repository
         [TestMethod]
         public void TestGetUserByName()
         {
-            IUserService userService = new UserService(_connection);
+            UserService userService = new UserService(_connection);
             var user = userService.GetByUserName("Dev");
             Assert.IsNotNull(user);
         }
@@ -45,7 +43,7 @@ namespace TestUnit.Repository
         {
             using (var transaction = _connection.BeginTransaction())
             {
-                IUserService userService = new UserService(_connection, transaction);
+                UserService userService = new UserService(_connection, transaction);
                 var userInsert = new UserInsert
                 {
                     UserName = "TestUser_" + Guid.NewGuid().ToString().Substring(0, 8),
@@ -56,8 +54,6 @@ namespace TestUnit.Repository
                 Assert.IsNotNull(user);
                 var userWhitPassword = userService.GetUpdateById(user.UserId);
                 Assert.IsTrue(Argon2Helper.VerifyPassword(userInsert.Password, userWhitPassword.Password));
-                
-                // Rollback is implicit if not committed, but I'll leave it as is for clarity (or just not commit)
             }
         }
     }

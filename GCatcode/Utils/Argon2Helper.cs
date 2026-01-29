@@ -43,10 +43,10 @@ namespace GCatcode.Utils
             try
             {
                 var combinedBytes = Convert.FromBase64String(hashedPassword);
-                if (combinedBytes.Length != SaltSize + HashSize)
-                {
-                    return false;
-                }
+                //if (combinedBytes.Length != SaltSize + HashSize)
+                //{
+                //    return false;
+                //}
 
                 var salt = new byte[SaltSize];
                 var expectedHash = new byte[HashSize];
