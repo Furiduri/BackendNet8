@@ -1,6 +1,8 @@
-﻿using Azure;
-using GCatcode.Api.Configuration;
+﻿using GCatcode.Api.Configuration;
+using GCatcode.Api.Controllers.Users;
+using GCatcode.Api.Core.Auth.Models;
 using GCatcode.Repository.DB.RolServices;
+using GCatcode.Repository.DB.RolServices.Models;
 using GCatcode.Repository.DB.UserRolServices;
 using GCatcode.Repository.DB.UserServices;
 using Microsoft.Data.SqlClient;
@@ -20,35 +22,35 @@ namespace GCatcode.Api.Core.Auth
             _configuration = configuration;
         }
 
-        public ApiResponse GetUserInfo(int userId)
+        public ApiResponse<UserInfo> GetUserInfo(int userId)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 var userInfo = new UserService(context).GetById(userId);
                 if (userInfo == null)
                 {
-                    return ApiResponse.ErrorResult(System.Net.HttpStatusCode.NotFound, AuthResponseMessage.UserNotFound.ToMsgString());
+                    return ApiResponse<UserInfo>.ErrorResult(AuthResponse.UserNotFound());
                 }
                 var roles = new RolesService(context).GetRolesByUserId(userId);
-                return ApiResponse.SuccessResult(new
+                return ApiResponse<UserInfo>.SuccessResult(new UserInfo
                 {
-                    email = userInfo.Email,
-                    username = userInfo.UserName,
-                    id = userId,
-                    roles = roles
+                    Email = userInfo.Email,
+                    UserName = userInfo.UserName,
+                    UserId = userId,
+                    Roles = roles
                 });
             }
         }
 
-        public ApiResponse Login(UserLogin user)
+        public ApiResponse<LoginInfo> Login(UserLogin user)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 var _userService = new UserService(context);
-                var userinfo = _userService.GetByUserName(user.Username);
+                var userinfo = _userService.GetByEmail(user.Email);
                 if (userinfo == null)
                 {
-                    return ApiResponse.ErrorResult(System.Net.HttpStatusCode.Unauthorized, ResponseMessageCommon.InvalidCredentials.ToMsgString());
+                    return ApiResponse<LoginInfo>.ErrorResult(AuthResponse.InvalidCredentials());
                 }
 
                 if (_userService.ValidPassword(user))
@@ -56,31 +58,42 @@ namespace GCatcode.Api.Core.Auth
                     var _userRolService = new UserRolService(context);
                     var roles = _userRolService.GetRolsByUserId(userinfo.UserId).ToList();
                     var token = GenerateJwtToken(userinfo, roles);
-                    return ApiResponse.SuccessResult(new LoginResponse
+                    return ApiResponse<LoginInfo>.SuccessResult(new LoginInfo
                     {
                         Token = token,
                         User = userinfo,
                     }, "Login Succes");
                 }
-                return ApiResponse.ErrorResult(System.Net.HttpStatusCode.Unauthorized, ResponseMessageCommon.InvalidCredentials.ToMsgString());
+                return ApiResponse<LoginInfo>.ErrorResult(AuthResponse.InvalidCredentials());
             }
         }
 
-        public ApiResponse Register(UserInsert user)
+        public ApiResponse<LoginInfo> Register(UserInsert data)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 context.Open();
                 var transaction = context.BeginTransaction();
-                var userCreated = new UserService(context, transaction).Add(user);
+                var userService = new UserService(context, transaction);
+                var userExists = userService.GetByEmail(data.Email);
+                if (userExists != null)
+                {
+                    return ApiResponse<LoginInfo>.ErrorResult(UserResponse.UserAlreadyExists());
+                }
+                var userCreated = userService.Add(data);
                 if (userCreated == null)
                 {
-                    return ApiResponse.ErrorResult(System.Net.HttpStatusCode.BadRequest, AuthResponseMessage.FailedUserCreation.ToMsgString());
+                    return ApiResponse<LoginInfo>.ErrorResult(AuthResponse.FailedUserCreation());
                 }
-
-                var roles = new RolesService(context).GetRolesByUserId(userCreated.UserId);
+                var _userRolService = new UserRolService(context, transaction);
+                var roles = _userRolService.GetRolsByUserId(userCreated.UserId).ToList();
+                transaction.Commit();
                 var token = GenerateJwtToken(userCreated, roles);
-                return ApiResponse.SuccessResult(new { token });
+                return ApiResponse<LoginInfo>.SuccessResult(new LoginInfo
+                {
+                    Token = token,
+                    User = userCreated,
+                }, "Login Succes");
             }
         }
 
@@ -88,9 +101,10 @@ namespace GCatcode.Api.Core.Auth
         {
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, $"{user.UserId}"),
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
             foreach (var role in roles)

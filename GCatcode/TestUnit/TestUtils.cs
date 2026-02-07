@@ -9,7 +9,6 @@
         public static void AssemblyInit(TestContext context)
         {
             // Este método se llama una vez para el ensamblado de pruebas, antes de que se ejecuten las pruebas.
-            
         }
 
         [TestMethod]

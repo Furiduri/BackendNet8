@@ -1,5 +1,6 @@
 ﻿using Dapper;
-using GCatcode.Repository.DB.RolServices;
+using GCatcode.Repository.DB.RolServices.Models;
+using GCatcode.Repository.DB.UserRolServices.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 

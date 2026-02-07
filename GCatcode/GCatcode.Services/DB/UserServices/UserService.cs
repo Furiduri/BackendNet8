@@ -1,7 +1,11 @@
 ﻿using Dapper;
+using GCatcode.Repository.DB.RolServices.Models;
 using GCatcode.Repository.DB.UserRolServices;
+using GCatcode.Repository.DB.UserRolServices.Models;
+using GCatcode.Repository.DB.UserServices.Models;
 using GCatcode.Utils;
 using GCatcode.Utils.extensions;
+using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -19,7 +23,7 @@ namespace GCatcode.Repository.DB.UserServices
         {
         }
 
-        public object ChangePassword(UserChangePassword data)
+        public GenericMessage ChangePassword(UserChangePassword data)
         {
             data.OldPassword = DecryptToBase64(data.OldPassword);
             data.NewPassword = DecryptToBase64(data.NewPassword);
@@ -27,22 +31,22 @@ namespace GCatcode.Repository.DB.UserServices
             var user = GetUpdateById(data.UserId);
             if (user == null)
             {
-                return new { message = "User not found." };
+                return new GenericMessage { Message = "User not found." };
             }
 
             if (!Argon2Helper.VerifyPassword(data.OldPassword, user.Password))
             {
-                return new { message = "Invalid current password." };
+                return new GenericMessage { Message = "Invalid current password." };
             }
 
             if (data.OldPassword == data.NewPassword)
             {
-                return new { message = "The new password is the same as the current password." };
+                return new GenericMessage { Message = "The new password is the same as the current password." };
             }
 
             if (!data.NewPassword.ValidatePassword())
             {
-                return new { message = "The new password does not meet the security requirements." };
+                return new GenericMessage { Message = "The new password does not meet the security requirements." };
             }
 
             string hashedNewPassword = Argon2Helper.HashPassword(data.NewPassword);
@@ -60,7 +64,7 @@ namespace GCatcode.Repository.DB.UserServices
                     dateTime = DateTime.UtcNow
                 }, Transaction);
 
-            return new { message = "Password changed successfully" };
+            return new GenericMessage { Message = "Password changed successfully" };
         }
 
         public bool CheckUserName(string userName, int? userId = null)
@@ -114,13 +118,13 @@ namespace GCatcode.Repository.DB.UserServices
 
         public UserDTO Add(UserInsert user)
         {
-            ValidUser(user);
             user.Password = DecryptToBase64(user.Password);
+            ValidUser(user);
             string hashedPassword = Argon2Helper.HashPassword(user.Password);
 
             var res = DbConnection.QueryFirstOrDefault<UserDTO>(
                 @"INSERT INTO [dbo].[Users] (UserName, Email, Password) VALUES (@UserName, @Email, @Password)
-                SELECT * FROM [dbo].[Users] WHERE UserId = @@IDENTITY", new { user.UserName, user.Email, Password = hashedPassword }, Transaction);
+                SELECT * FROM [dbo].[Users] WHERE UserId = @@IDENTITY", new { user.UserName, Email = user.Email.ToLower(), Password = hashedPassword }, Transaction);
 
             if (res == null)
             {
@@ -131,7 +135,7 @@ namespace GCatcode.Repository.DB.UserServices
             userRolService.Insert(new UserRolDTO
             {
                 UserId = res.UserId,
-                RolId = RolServices.RolesType.Guest,
+                RolId = RolesType.Guest,
             });
             return res;
         }
@@ -144,13 +148,6 @@ namespace GCatcode.Repository.DB.UserServices
             }
 
             ValidUser(data);
-
-            // Note: If updating password here, it should be hashed.
-            // However, typically Update shouldn't change password unless explicitly handled.
-            // For now, I'll keep the current logic but ensure it's hashed if changed.
-            // But since Password passed in UserUpdate might be the hash already or a new plain password...
-            // Decalring that for regular updates, we don't change password unless handled.
-            // Looking at original code, it was just saving whatever was in data.Password.
 
             return DbConnection.QueryFirstOrDefault<UserDTO>(
                 $@"UPDATE [dbo].[Users]
@@ -165,7 +162,7 @@ namespace GCatcode.Repository.DB.UserServices
                 {
                     data.UserId,
                     data.UserName,
-                    data.Email,
+                    Email = data.Email.ToLower(),
                     data.Available,
                     dateTime = DateTime.UtcNow
                 }, Transaction);
@@ -174,12 +171,12 @@ namespace GCatcode.Repository.DB.UserServices
         public bool ValidPassword(UserLogin userLogin)
         {
             userLogin.Password = DecryptToBase64(userLogin.Password);
-            var userByName = GetByUserName(userLogin.Username);
-            if (userByName == null)
+            var userInDB = GetByEmail(userLogin.Email);
+            if (userInDB == null)
             {
                 return false;
             }
-            var user = GetUpdateById(userByName.UserId);
+            var user = GetUpdateById(userInDB.UserId);
 
             return Argon2Helper.VerifyPassword(userLogin.Password, user.Password);
         }
@@ -247,6 +244,12 @@ namespace GCatcode.Repository.DB.UserServices
                     ORDER BY UserName
                     OFFSET {(page - 1) * 10} ROWS FETCH NEXT 10 ROWS ONLY",
                 new { userName = $"%{userName}%" }, Transaction);
+        }
+
+        public UserDTO? GetByEmail(string email)
+        {
+            return DbConnection.QueryFirstOrDefault<UserDTO>(
+                @"SELECT * FROM [dbo].[Users] WHERE Email = @email", new { email = email.ToLower() }, Transaction);
         }
     }
 }

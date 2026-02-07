@@ -1,64 +1,53 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json.Serialization;
 
 namespace GCatcode.Api.Core
 {
-    public class ApiResponse
+    public class ApiResponse<T>
     {
-        public bool Success { get; set; }
+        public bool IsSuccess { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Message { get; set; } = null;
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public HttpStatusCode StatusCode { get; set; }
+        public int StatusCode { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object Data { get; set; }
+        public T Data { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<string> Errors { get; set; } = null;
 
-        public static ApiResponse SuccessResult(object data, string message = "Success")
+        public static ApiResponse<T> SuccessResult(T data, string message = "Success")
         {
-            return new ApiResponse
+            return new ApiResponse<T>
             {
-                Success = true,
-                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                StatusCode = (int)HttpStatusCode.OK,
                 Data = data,
                 Message = message
             };
         }
 
-        public static ApiResponse ErrorResult(HttpStatusCode httpStatusCode, string error)
+        public static ApiResponse<T> ErrorResult(StatusResponse statusResponse)
         {
-            return new ApiResponse
+            return new ApiResponse<T>
             {
-                Success = false,
-                StatusCode = httpStatusCode,
-                Errors = new List<string>() { error }
+                IsSuccess = false,
+                StatusCode = (int)statusResponse.StatusCode,
+                Errors = new List<string>() { statusResponse.Message }
             };
         }
 
-        public static ApiResponse ErrorResult(HttpStatusCode httpStatusCode, List<string> errors = null)
+        public static ApiResponse<T> Result(StatusResponse statusResponse, T data)
         {
-            return new ApiResponse
+            return new ApiResponse<T>
             {
-                Success = false,
-                StatusCode = httpStatusCode,
-                Errors = errors ?? new List<string>()
-            };
-        }
-
-        public static ApiResponse InternalServerError(Exception internalServerError)
-        {
-            return new ApiResponse
-            {
-                Success = false,
-                StatusCode = HttpStatusCode.InternalServerError,
-                Data = internalServerError,
-                Errors = new List<string> { internalServerError.Message }
+                IsSuccess = statusResponse.isSuccess,
+                StatusCode = (int)statusResponse.StatusCode,
+                Data = data,
+                Errors = new List<string>() { statusResponse.Message }
             };
         }
     }

@@ -7,6 +7,7 @@ namespace GCatcode.Repository.DB
     {
         protected readonly SqlConnection DbConnection;
         protected IDbTransaction Transaction;
+
         public DBService(SqlConnection dbConnection, IDbTransaction transaction)
         {
             DbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));

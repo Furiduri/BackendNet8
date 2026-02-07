@@ -1,9 +1,8 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.RolServices;
+using GCatcode.Repository.DB.RolServices.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GCatcode.Api.Controllers.Roles
 {
@@ -20,90 +19,70 @@ namespace GCatcode.Api.Controllers.Roles
         }
 
         [HttpGet]
-        public ActionResult<List<RolDTO>> Get(int page = 1)
+        [ProducesResponseType<List<RolDTO>>(StatusCodes.Status200OK)]
+        public ActionResult Get(int page = 1)
         {
             try
             {
-                ApiResponse response = _methods.Get(page);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.Get(page);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(RolesResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpGet, Route("{id}")]
-        public ActionResult<RolDTO> GetById(int id)
+        [ProducesResponseType<RolDTO>(StatusCodes.Status200OK)]
+        public ActionResult GetById(int id)
         {
             try
             {
-                ApiResponse response = _methods.GetById(id);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.GetById(id);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(RolesResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpPut, Route("")]
-        public ActionResult<RolDTO> Put([FromBody] RolUpdate data)
+        [ProducesResponseType<RolDTO>(StatusCodes.Status200OK)]
+        public ActionResult Put([FromBody] RolUpdate data)
         {
             try
             {
-                ApiResponse response = _methods.Update(data);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.Update(data);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(RolesResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpDelete, Route("{id}")]
+        [ProducesResponseType<int>(StatusCodes.Status200OK)]
         public ActionResult Del(int id)
         {
             try
             {
-                ApiResponse response = _methods.Delete(id);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.Delete(id);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(RolesResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
     }

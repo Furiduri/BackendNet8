@@ -1,7 +1,5 @@
 using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.UserRolServices;
-using GCatcode.Repository.DB.UserServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Controllers
@@ -15,24 +13,19 @@ namespace GCatcode.Api.Controllers
         }
 
         [HttpGet, Route("")]
+        [ProducesResponseType<string>(StatusCodes.Status200OK)]
         public ActionResult Get()
         {
             try
             {
-                ApiResponse response = ApiResponse.SuccessResult($"Holi {GetUserName()}");
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = ApiResponse<string>.SuccessResult($"Holi {GetUserName()}");
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = BaseResponse.InternalServerError(ex.Message);
+                return StatusCode((int)response.StatusCode, response);
             }
         }
     }

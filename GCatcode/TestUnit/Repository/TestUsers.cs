@@ -39,6 +39,14 @@ namespace TestUnit.Repository
         }
 
         [TestMethod]
+        public void TestGetUserByEmail()
+        {
+            UserService userService = new UserService(_connection);
+            var user = userService.GetByEmail("dev@local.com");
+            Assert.IsNotNull(user);
+        }
+
+        [TestMethod]
         public void TestAddUser()
         {
             using (var transaction = _connection.BeginTransaction())

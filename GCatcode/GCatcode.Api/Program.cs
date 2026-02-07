@@ -77,6 +77,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("CorsPolicy", corsBuilder =>
     {
         corsBuilder.WithOrigins(
+            "http://localhost:7185",
             "http://localhost:5173",
             "https://localhost:5173")
         .AllowAnyHeader()

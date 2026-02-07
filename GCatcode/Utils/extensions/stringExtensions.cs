@@ -15,7 +15,7 @@ namespace GCatcode.Utils.extensions
 
             if (trimmedEmail.EndsWith("."))
             {
-                return false; 
+                return false;
             }
             try
             {
@@ -41,7 +41,7 @@ namespace GCatcode.Utils.extensions
             var hasMinimum8Chars = new Regex(@".{8,}");
             var hasSymbols = new Regex(@"[!@#$%^&*()_+=\[{\]};:<>|./?,-]");
 
-            return hasNumber.IsMatch(password) && hasSymbols.IsMatch(password) && hasLowerChar.IsMatch(password) && hasUpperChar.IsMatch(password) && hasMinimum8Chars.IsMatch(password);            
+            return hasNumber.IsMatch(password) && hasSymbols.IsMatch(password) && hasLowerChar.IsMatch(password) && hasUpperChar.IsMatch(password) && hasMinimum8Chars.IsMatch(password);
         }
     }
 }

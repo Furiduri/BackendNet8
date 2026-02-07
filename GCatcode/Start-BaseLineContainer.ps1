@@ -23,5 +23,5 @@ if ($containerExists) {
 Start-Sleep -Seconds 10
 # Ejecutar las migraciones de Entity Framework Core
 Write-Host "Aplicando migraciones de Entity Framework Core..." -ForegroundColor Yellow
-dotnet ef database update --project Gcatcode.DataBase/Gcatcode.DataBase.csproj --startup-project Gcatcode.API/Gcatcode.API.csproj
+dotnet ef database update --project Gcatcode.DataBase/Gcatcode.DataBase.csproj --startup-project Gcatcode.Api/Gcatcode.Api.csproj
 Write-Host "Migraciones aplicadas correctamente." -ForegroundColor Green

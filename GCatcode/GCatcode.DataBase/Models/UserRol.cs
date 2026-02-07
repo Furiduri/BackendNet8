@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace GCatcode.DataBase.Models
+﻿namespace GCatcode.DataBase.Models
 {
     public class UserRol : BaseModel
     {

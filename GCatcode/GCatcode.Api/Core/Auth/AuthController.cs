@@ -1,4 +1,5 @@
 ﻿using GCatcode.Api.Configuration;
+using GCatcode.Api.Core.Auth.Models;
 using GCatcode.Repository.DB.UserServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,29 +15,24 @@ namespace GCatcode.Api.Core.Auth
         public AuthController(AppSettings configuration)
             : base(configuration)
         {
-            _methods = new AuthMethods(configuration);            
+            _methods = new AuthMethods(configuration);
         }
 
         [Authorize]
         [HttpGet("user_info")]
+        [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
         public ActionResult GetUserInfo()
         {
             try
             {
-                ApiResponse response = _methods.GetUserInfo(GetUserId());
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.GetUserInfo(GetUserId());
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(AuthResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
@@ -46,24 +42,19 @@ namespace GCatcode.Api.Core.Auth
         /// <param name="user">user and Password in string Base64</param>
         /// <returns>JWT token</returns>
         [HttpPost("login")]
+        [ProducesResponseType<LoginInfo>(StatusCodes.Status200OK)]
         public ActionResult Login([FromBody] UserLogin user)
         {
             try
             {
-                ApiResponse response = _methods.Login(user);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.Login(user);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(AuthResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
@@ -73,24 +64,19 @@ namespace GCatcode.Api.Core.Auth
         /// <param name="user"> UserName, email and Password in string Base64</param>
         /// <returns>JWT token</returns>
         [HttpPost("register")]
+        [ProducesResponseType<LoginInfo>(StatusCodes.Status200OK)]
         public IActionResult Register([FromBody] UserInsert user)
         {
             try
             {
-                ApiResponse response = _methods.Register(user);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.Register(user);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(AuthResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
 using GCatcode.Repository.DB.RolServices;
+using GCatcode.Repository.DB.RolServices.Models;
 using Microsoft.Data.SqlClient;
 
 namespace GCatcode.Api.Controllers.Roles
@@ -14,16 +15,16 @@ namespace GCatcode.Api.Controllers.Roles
             _configuration = configuration;
         }
 
-        public ApiResponse Get(int page)
+        public ApiResponse<IEnumerable<RolDTO>> Get(int page)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 var roles = new RolesService(context).Get(page, new RolFilter { Available = true });
-                return ApiResponse.SuccessResult(roles);
+                return ApiResponse<IEnumerable<RolDTO>>.SuccessResult(roles);
             }
         }
 
-        public ApiResponse Update(RolUpdate data)
+        public ApiResponse<RolDTO> Update(RolUpdate data)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
@@ -32,27 +33,27 @@ namespace GCatcode.Api.Controllers.Roles
                 var service = new RolesService(context, transaction);
                 var role = service.GetById(data.RolId);
                 if (role == null)
-                    return ApiResponse.ErrorResult(System.Net.HttpStatusCode.NotFound, RolesResponseMenssage.RoleNotFound.ToMsgString());
+                    return ApiResponse<RolDTO>.ErrorResult(RolesResponse.RoleNotFound());
 
                 var res = service.Update(data);
                 transaction.Commit();
-                return ApiResponse.SuccessResult(res);
+                return ApiResponse<RolDTO>.SuccessResult(res);
             }
         }
 
-        public ApiResponse GetById(int id)
+        public ApiResponse<RolDTO> GetById(int id)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 var role = new RolesService(context).GetById(id);
                 if (role == null)
-                    return ApiResponse.ErrorResult(System.Net.HttpStatusCode.NotFound, RolesResponseMenssage.RoleNotFound.ToMsgString());
+                    return ApiResponse<RolDTO>.ErrorResult(RolesResponse.RoleNotFound());
 
-                return ApiResponse.SuccessResult(role);
+                return ApiResponse<RolDTO>.SuccessResult(role);
             }
         }
 
-        public ApiResponse Delete(int id)
+        public ApiResponse<RolDTO> Delete(int id)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
@@ -61,10 +62,10 @@ namespace GCatcode.Api.Controllers.Roles
                 var service = new RolesService(context, transaction);
                 var role = service.GetById(id);
                 if (role == null)
-                    return ApiResponse.ErrorResult(System.Net.HttpStatusCode.NotFound, RolesResponseMenssage.RoleNotFound.ToMsgString());
+                    return ApiResponse<RolDTO>.ErrorResult(RolesResponse.RoleNotFound());
                 var res = service.Delete(id);
                 transaction.Commit();
-                return ApiResponse.SuccessResult(res);
+                return ApiResponse<RolDTO>.SuccessResult(res);
             }
         }
     }

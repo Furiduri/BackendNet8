@@ -1,5 +1,5 @@
 ﻿using GCatcode.Api.Configuration;
-using GCatcode.Repository.DB.RolServices;
+using GCatcode.Repository.DB.RolServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -26,6 +26,18 @@ namespace GCatcode.Api.Core
                 UserName = User.FindFirstValue(ClaimTypes.Name);
             }
             return UserName;
+        }
+
+        private string UserEmail { get; set; }
+
+        [NonAction]
+        protected string GetUserEmail()
+        {
+            if (string.IsNullOrEmpty(UserEmail))
+            {
+                UserEmail = User.FindFirstValue(ClaimTypes.Email);
+            }
+            return UserEmail;
         }
 
         private int? UserId { get; set; }

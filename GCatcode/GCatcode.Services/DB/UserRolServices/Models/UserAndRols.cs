@@ -1,7 +1,7 @@
-﻿using GCatcode.Repository.DB.RolServices;
+﻿using GCatcode.Repository.DB.RolServices.Models;
 using GCatcode.Repository.DB.UserServices;
 
-namespace GCatcode.Repository.DB.UserRolServices
+namespace GCatcode.Repository.DB.UserRolServices.Models
 {
     public class UserAndRols : UserDTO
     {

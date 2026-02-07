@@ -1,4 +1,4 @@
-﻿using System;
+﻿using GCatcode.DataBase.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -84,16 +84,15 @@ namespace GCatcode.DataBase.Migrations
                 column: "UserName",
                 unique: true);
 
-
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "UserId", "UserName", "Email", "Password" },
                 values: new object[,]
                 {
-                    {0, "Dev", null ,  Utils.Argon2Helper.HashPassword("Dev12345") },
-                    {1, "Guest", null , Utils.Argon2Helper.HashPassword("Gest12345") },
-                    {2, "User", null , Utils.Argon2Helper.HashPassword("User12345") },
-                    {3, "Admin", null , Utils.Argon2Helper.HashPassword("Admin12345") }
+                    {0, "Dev", "dev@local.com" ,  Utils.Argon2Helper.HashPassword("Dev12345") },
+                    {1, "Guest","guest@local.com" , Utils.Argon2Helper.HashPassword("Gest12345") },
+                    {2, "User", "user@local.com" , Utils.Argon2Helper.HashPassword("User12345") },
+                    {3, "Admin", "admin@local.com" , Utils.Argon2Helper.HashPassword("Admin12345") }
             });
 
             migrationBuilder.InsertData(
@@ -101,10 +100,10 @@ namespace GCatcode.DataBase.Migrations
                 columns: new[] { "RolId", "Name", "Description" },
                 values: new object[,]
                 {
-                    {0, "Dev", "All Access Development" },
-                    {1, "Guest", "Limited Access" },
-                    {2, "User", "Access parcial" },
-                    {3, "Admin" , "All Access Administration"}
+                    {RolesType.Dev, $"{RolesType.Dev}", "All Access Development" },
+                    {RolesType.Guest, $"{RolesType.Guest}", "Limited Access" },
+                    {RolesType.User, $"{RolesType.User}", "Access parcial" },
+                    {RolesType.Admin, $"{RolesType.Admin}" , "All Access Administration"}
             });
 
             migrationBuilder.InsertData(

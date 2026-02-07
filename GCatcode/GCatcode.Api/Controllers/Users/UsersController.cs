@@ -1,7 +1,9 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.UserRolServices;
+using GCatcode.Repository.DB.UserRolServices.Models;
 using GCatcode.Repository.DB.UserServices;
+using GCatcode.Repository.DB.UserServices.Models;
+using GCatcode.Utils.GenericModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,164 +23,144 @@ namespace GCatcode.Api.Controllers.Users
         }
 
         [HttpGet("Search")]
+        [ProducesResponseType<IEnumerable<UserItem>>(StatusCodes.Status200OK)]
         public ActionResult Search(string term, int page = 1)
         {
             try
             {
-                ApiResponse response = _methods.SearchUsers(term, page);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.SearchUsers(term, page);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(UserResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpGet]
-        public ActionResult<List<UserDTO>> Get(int page = 1, bool available = true)
+        [ProducesResponseType<IEnumerable<UserDTO>>(StatusCodes.Status200OK)]
+        public ActionResult Get(int page = 1, bool available = true)
         {
             try
             {
                 if (!IsAdmin)
-                    return Unauthorized();
+                {
+                    var status = ApiResponse<string>.ErrorResult(UserResponse.UserNotAdmin());
+                    return StatusCode((int)status.StatusCode, status);
+                }
 
-                ApiResponse response = _methods.GetListUsers(page, available);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.GetListUsers(page, available);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(UserResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpGet, Route("{id}")]
-        public ActionResult<UserAndRols> GetById(int id)
+        [ProducesResponseType<UserAndRols>(StatusCodes.Status200OK)]
+        public ActionResult GetById(int id)
         {
             try
             {
-                ApiResponse response = _methods.GetById(id);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.GetById(id);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(UserResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpPost]
-        public ActionResult<UserDTO> Post([FromBody] UserInsert data)
+        [ProducesResponseType<UserDTO>(StatusCodes.Status200OK)]
+        public ActionResult Post([FromBody] UserInsert data)
         {
             try
             {
-                ApiResponse response = _methods.CreateUser(data);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.CreateUser(data);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(UserResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpPut]
+        [ProducesResponseType<UserDTO>(StatusCodes.Status200OK)]
         public ActionResult<UserDTO> Put([FromBody] UserUpdate data)
         {
             try
             {
-                ApiResponse response = _methods.Update(data);
-                if (response.Success)
+                if (!IsAdmin)
                 {
-                    return Ok(response);
+                    var status = ApiResponse<string>.ErrorResult(UserResponse.UserNotAdmin());
+                    return StatusCode((int)status.StatusCode, status);
                 }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.Update(data);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(UserResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpPut, Route("ChangePassword")]
-        public ActionResult<UserDTO> ChangePassword([FromBody] UserChangePassword data)
+        [ProducesResponseType<GenericMessage>(StatusCodes.Status200OK)]
+        public ActionResult ChangePassword([FromBody] UserChangePassword data)
         {
             try
             {
-                ApiResponse response = _methods.ChangePassword(data);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.ChangePassword(data);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(UserResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
 
         [HttpDelete, Route("{id}")]
-        public ActionResult<UserDTO> Delete(int id)
+        [ProducesResponseType<UserDTO>(StatusCodes.Status200OK)]
+        public ActionResult Delete(int id)
         {
             if (!IsAdmin)
-                return Unauthorized();
+            {
+                var status = ApiResponse<string>.ErrorResult(UserResponse.UserNotAdmin());
+                return StatusCode((int)status.StatusCode, status);
+            }
+
             if (id == GetUserId())
-                return BadRequest(UserResponseMenssage.UserNotDeleteSelf.ToMsgString());
+            {
+                var status = ApiResponse<string>.ErrorResult(UserResponse.UserNotDeleteSelf());
+                return StatusCode((int)status.StatusCode, status);
+            }
 
             try
             {
-                ApiResponse response = _methods.Delete(id);
-                if (response.Success)
-                {
-                    return Ok(response);
-                }
-                else
-                {
-                    return BadRequest(response);
-                }
+                var response = _methods.Delete(id);
+                return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+                var response = ApiResponse<string>.ErrorResult(UserResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
             }
         }
     }

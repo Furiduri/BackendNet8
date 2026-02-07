@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+
 namespace GCatcode.DataBase.Models
 {
     [Index(nameof(UserName), IsUnique = true)]
@@ -16,6 +17,7 @@ namespace GCatcode.DataBase.Models
 
         [Required]
         public string Password { get; set; }
+
         public IEnumerable<UserRol> UserRoles { get; internal set; }
     }
 }

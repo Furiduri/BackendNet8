@@ -116,7 +116,7 @@ TestUnit/                  # Proyecto de pruebas unitarias
 
 1. **Crear Carpeta**: Cada controlador en su propia carpeta bajo `Controllers/{Entity}/`
 2. **Crear Archivo de Métodos**: `{Entity}Methods.cs` para lógica específica
-3. **Crear Archivo de Mensajes**: `{Entity}ResponseMessage.cs` para mensajes estandarizados
+3. **Crear Archivo de Mensajes**: `{Entity}Response.cs` para mensajes estandarizados, heredado de `BaseResponse` en Core
 4. **Heredar de `BaseController`**: Todos los controladores deben heredar de esta clase
 5. **Usar atributos de ruta**: `[ApiController, Route("api/[controller]")]`
 6. **Manejo de errores**: Implementar estructura de respuestas en cada método
@@ -151,7 +151,7 @@ TestUnit/                  # Proyecto de pruebas unitarias
 
 - **Controladores**: `{Entity}Controller.cs`
 - **Methods del los controladores**: `{Entity}Methods.cs`
-- **Mensajes de Respuesta**: `{Entity}ResponseMessage.cs`
+- **Mensajes de Respuesta**: `{Entity}Response.cs`
 - **Servicios**: `{Entity}Service.cs`
 - **DTOs**: `{Entity}DTO.cs`, `{Entity}Insert.cs`, `{Entity}Update.cs`
 - **Rutas**: Usar convención RESTful (`/api/{controller}/{action?}/{id?}`)
@@ -161,19 +161,12 @@ TestUnit/                  # Proyecto de pruebas unitarias
 ```csharp
 try{
     ApiResponse response = _methods.{action}();
-    if (response.Success)
-    {// Retornar 200 OK
-        return Ok(response);
-    }
-    else
-    {
-      // Retornar 400 Bad Request
-        return BadRequest(response);
-    }
+    return StatusCode(response.StatusCode, response);
 }catch (Exception ex)
 {
     LogError(ex);
-    return BadRequest($"{ResponseMessageCommon.InternalServerError.ToMsgString()} : {ex.Message}");
+    var response = UserResponse.InternalServerError(ex.Message);
+    return StatusCode((int)response.StatusCode, response);
 }
 ```
 
