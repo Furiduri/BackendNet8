@@ -12,7 +12,7 @@ namespace GCatcode.Api.Core.Auth
         {
             Key = "UserCreationFailed",
             isSuccess = false,
-            StatusCode = HttpStatusCode.BadRequest,
+            StatusCode = HttpStatusCode.InternalServerError,
             Message = "User creation failed due to invalid data or server error."
         };
 
@@ -22,6 +22,21 @@ namespace GCatcode.Api.Core.Auth
             isSuccess = false,
             StatusCode = HttpStatusCode.NotFound,
             Message = "The specified user was not found."
+        };
+
+        public static StatusResponse InvalidRefreshToken() => new StatusResponse
+        {
+            Key = "InvalidRefreshToken",
+            isSuccess = false,
+            StatusCode = HttpStatusCode.Unauthorized,
+            Message = "The refresh token is invalid, expired, or has been revoked."
+        };
+
+        public static StatusResponse RevokeFailed() => new StatusResponse
+        {
+            Key = "RevokeFailed",
+            StatusCode = HttpStatusCode.InternalServerError,
+            Message = "Failed to revoke token"
         };
     }
 }

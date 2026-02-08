@@ -47,7 +47,8 @@ namespace GCatcode.Api.Core.Auth
         {
             try
             {
-                var response = _methods.Login(user);
+                var ipAddress = GetIpAddress();
+                var response = _methods.Login(user, ipAddress);
                 return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
@@ -69,7 +70,8 @@ namespace GCatcode.Api.Core.Auth
         {
             try
             {
-                var response = _methods.Register(user);
+                var ipAddress = GetIpAddress();
+                var response = _methods.Register(user, ipAddress);
                 return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
@@ -78,6 +80,60 @@ namespace GCatcode.Api.Core.Auth
                 var response = ApiResponse<string>.ErrorResult(AuthResponse.InternalServerError(ex.Message));
                 return StatusCode((int)response.StatusCode, response);
             }
+        }
+
+        /// <summary>
+        /// Refresh access token using refresh token
+        /// </summary>
+        /// <param name="request">Refresh token</param>
+        /// <returns>New JWT token and refresh token</returns>
+        [HttpPost("refresh")]
+        [ProducesResponseType<LoginInfo>(StatusCodes.Status200OK)]
+        public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            try
+            {
+                var ipAddress = GetIpAddress();
+                var response = _methods.RefreshToken(request.RefreshToken, ipAddress);
+                return StatusCode(response.StatusCode, response);
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+                var response = ApiResponse<string>.ErrorResult(AuthResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
+            }
+        }
+
+        /// <summary>
+        /// Revoke refresh token
+        /// </summary>
+        /// <param name="request">Refresh token to revoke</param>
+        /// <returns>Success message</returns>
+        [HttpPost("revoke")]
+        [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+        public IActionResult RevokeToken([FromBody] RefreshTokenRequest request)
+        {
+            try
+            {
+                var ipAddress = GetIpAddress();
+                var response = _methods.RevokeToken(request.RefreshToken, ipAddress);
+                return StatusCode(response.StatusCode, response);
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+                var response = ApiResponse<string>.ErrorResult(AuthResponse.InternalServerError(ex.Message));
+                return StatusCode((int)response.StatusCode, response);
+            }
+        }
+
+        private string GetIpAddress()
+        {
+            if (Request.Headers.ContainsKey("X-Forwarded-For"))
+                return Request.Headers["X-Forwarded-For"];
+
+            return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "unknown";
         }
     }
 }

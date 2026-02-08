@@ -1,6 +1,8 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Controllers.Users;
 using GCatcode.Api.Core.Auth.Models;
+using GCatcode.Repository.DB.RefreshTokenServices;
+using GCatcode.Repository.DB.RefreshTokenServices.Models;
 using GCatcode.Repository.DB.RolServices;
 using GCatcode.Repository.DB.RolServices.Models;
 using GCatcode.Repository.DB.UserRolServices;
@@ -9,6 +11,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace GCatcode.Api.Core.Auth
@@ -42,11 +45,13 @@ namespace GCatcode.Api.Core.Auth
             }
         }
 
-        public ApiResponse<LoginInfo> Login(UserLogin user)
+        public ApiResponse<LoginInfo> Login(UserLogin user, string ipAddress)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
-                var _userService = new UserService(context);
+                context.Open();
+                var transaction = context.BeginTransaction();
+                var _userService = new UserService(context, transaction);
                 var userinfo = _userService.GetByEmail(user.Email);
                 if (userinfo == null)
                 {
@@ -55,12 +60,31 @@ namespace GCatcode.Api.Core.Auth
 
                 if (_userService.ValidPassword(user))
                 {
-                    var _userRolService = new UserRolService(context);
+                    var _userRolService = new UserRolService(context, transaction);
                     var roles = _userRolService.GetRolsByUserId(userinfo.UserId).ToList();
-                    var token = GenerateJwtToken(userinfo, roles);
+
+                    var tokenExpiryDate = DateTime.UtcNow.AddMinutes(_configuration.JwtSettings.AccessTokenExpirationMinutes);
+                    var refreshExpiryDate = DateTime.UtcNow.AddDays(_configuration.JwtSettings.RefreshTokenExpirationDays);
+
+                    var token = GenerateJwtToken(userinfo, roles, tokenExpiryDate);
+                    var refreshToken = GenerateRefreshToken(ipAddress);
+
+                    var _refreshTokenService = new RefreshTokenService(context, transaction);
+                    _refreshTokenService.RemoveExpiredTokens();
+                    _refreshTokenService.Add(new RefreshTokenInsert
+                    {
+                        UserId = userinfo.UserId,
+                        Token = refreshToken,
+                        ExpiryDate = refreshExpiryDate,
+                        CreatedByIp = ipAddress
+                    });
+                    transaction.Commit();
                     return ApiResponse<LoginInfo>.SuccessResult(new LoginInfo
                     {
                         Token = token,
+                        RefreshToken = refreshToken,
+                        TokenExpiryDate = tokenExpiryDate,
+                        RefreshExpiryDate = refreshExpiryDate,
                         User = userinfo,
                     }, "Login Succes");
                 }
@@ -68,7 +92,65 @@ namespace GCatcode.Api.Core.Auth
             }
         }
 
-        public ApiResponse<LoginInfo> Register(UserInsert data)
+        public ApiResponse<LoginInfo> RefreshToken(string token, string ipAddress)
+        {
+            using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
+            {
+                context.Open();
+                var transaction = context.BeginTransaction();
+
+                var _refreshTokenService = new RefreshTokenService(context, transaction);
+                _refreshTokenService.RemoveExpiredTokens();
+                var refreshToken = _refreshTokenService.GetByToken(token);
+
+                if (refreshToken == null || !refreshToken.IsActive)
+                {
+                    transaction.Rollback();
+                    return ApiResponse<LoginInfo>.ErrorResult(AuthResponse.InvalidRefreshToken());
+                }
+
+                var tokenExpiryDate = DateTime.UtcNow.AddMinutes(_configuration.JwtSettings.AccessTokenExpirationMinutes);
+                var refreshExpiryDate = DateTime.UtcNow.AddDays(_configuration.JwtSettings.RefreshTokenExpirationDays);
+
+                var newRefreshToken = GenerateRefreshToken(ipAddress);
+
+                _refreshTokenService.RevokeTokenAndReplace(token, newRefreshToken, ipAddress);
+                _refreshTokenService.Add(new RefreshTokenInsert
+                {
+                    UserId = refreshToken.UserId,
+                    Token = newRefreshToken,
+                    ExpiryDate = refreshExpiryDate,
+                    CreatedByIp = ipAddress
+                });
+
+                var _userService = new UserService(context, transaction);
+                var user = _userService.GetById(refreshToken.UserId);
+
+                if (user == null)
+                {
+                    transaction.Rollback();
+                    return ApiResponse<LoginInfo>.ErrorResult(AuthResponse.UserNotFound());
+                }
+
+                var _userRolService = new UserRolService(context, transaction);
+                var roles = _userRolService.GetRolsByUserId(user.UserId).ToList();
+
+                var newJwtToken = GenerateJwtToken(user, roles, tokenExpiryDate);
+
+                transaction.Commit();
+
+                return ApiResponse<LoginInfo>.SuccessResult(new LoginInfo
+                {
+                    Token = newJwtToken,
+                    TokenExpiryDate = tokenExpiryDate,
+                    RefreshToken = newRefreshToken,
+                    RefreshExpiryDate = refreshExpiryDate,
+                    User = user
+                }, "Token refreshed successfully");
+            }
+        }
+
+        public ApiResponse<LoginInfo> Register(UserInsert data, string ipAddress)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
@@ -87,17 +169,60 @@ namespace GCatcode.Api.Core.Auth
                 }
                 var _userRolService = new UserRolService(context, transaction);
                 var roles = _userRolService.GetRolsByUserId(userCreated.UserId).ToList();
+
+                var tokenExpiryDate = DateTime.UtcNow.AddMinutes(_configuration.JwtSettings.AccessTokenExpirationMinutes);
+                var refreshExpiryDate = DateTime.UtcNow.AddDays(_configuration.JwtSettings.RefreshTokenExpirationDays);
+
+                var token = GenerateJwtToken(userCreated, roles, tokenExpiryDate);
+                var refreshToken = GenerateRefreshToken(ipAddress);
+
+                var _refreshTokenService = new RefreshTokenService(context, transaction);
+                _refreshTokenService.RemoveExpiredTokens();
+                _refreshTokenService.Add(new RefreshTokenInsert
+                {
+                    UserId = userCreated.UserId,
+                    Token = refreshToken,
+                    ExpiryDate = refreshExpiryDate,
+                    CreatedByIp = ipAddress
+                });
+
                 transaction.Commit();
-                var token = GenerateJwtToken(userCreated, roles);
                 return ApiResponse<LoginInfo>.SuccessResult(new LoginInfo
                 {
                     Token = token,
+                    TokenExpiryDate = tokenExpiryDate,
+                    RefreshToken = refreshToken,
+                    RefreshExpiryDate = refreshExpiryDate,
                     User = userCreated,
                 }, "Login Succes");
             }
         }
 
-        private string GenerateJwtToken(UserDTO user, IEnumerable<RolItem> roles)
+        public ApiResponse<bool> RevokeToken(string token, string ipAddress)
+        {
+            using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
+            {
+                var _refreshTokenService = new RefreshTokenService(context);
+                _refreshTokenService.RemoveExpiredTokens();
+                var refreshToken = _refreshTokenService.GetByToken(token);
+
+                if (refreshToken == null || !refreshToken.IsActive)
+                {
+                    return ApiResponse<bool>.ErrorResult(AuthResponse.InvalidRefreshToken());
+                }
+
+                var result = _refreshTokenService.RevokeToken(token, ipAddress);
+
+                if (result)
+                {
+                    return ApiResponse<bool>.SuccessResult(true, "Token revoked successfully");
+                }
+
+                return ApiResponse<bool>.ErrorResult(AuthResponse.RevokeFailed());
+            }
+        }
+
+        private string GenerateJwtToken(UserDTO user, IEnumerable<RolItem> roles, DateTime expires)
         {
             var claims = new List<Claim>
             {
@@ -119,10 +244,20 @@ namespace GCatcode.Api.Core.Auth
                 issuer: _configuration.JwtSettings.Issuer,
                 audience: _configuration.JwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: expires,
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private string GenerateRefreshToken(string ipAddress)
+        {
+            var randomBytes = new byte[64];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

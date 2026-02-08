@@ -22,16 +22,33 @@ API backend construida en .NET 8 que proporciona servicios de autenticación, ge
 ```
 GCatcode.Api/              # Capa de presentación (API)
 ├── Controllers/           # Controladores de API
-├─── {Nombre de ruta}/   # Controladores específicos por ruta
+├─── {Ruta}/   # Controladores específicos por ruta
+|   ├── Models/             # Modelos específicos del controlador
+|   ├── {Ruta}Controller.cs  # Controlador principal
+|   ├── {Ruta}Methods.cs     # Lógica específica del controlador
+|   └── {Ruta}Response.cs    # Mensajes de respuesta estandarizados
 ├── Core/                  # Funcionalidad base y autenticación
-├─── Auth/                # Lógica de autenticación JWT
+|   ├── BaseController.cs     # Controlador base con funcionalidades comunes
+|   ├── BaseResponse.cs       # Respuesta base para estandarizar mensajes
+|   └── Auth/                # Lógica de autenticación JWT
 └── Program.cs            # Punto de entrada y configuración
 
 GCatcode.Repository/       # Capa de lógica de negocio
-├── DB/                   # Servicios de acceso a datos
-└─── {Entidad}Services/    # Servicios específicos por entidad
+└── DB/                   # Servicios de acceso a datos
+    ├── DBService.cs          # Servicio base para acceso a datos
+    └── {Entidad}Services/    # Servicios específicos por entidad
+        ├── Models/                # Modelos específicos de la entidad
+        |   ├── {Entidad}DTO.cs       # DTO para la entidad
+        └── {Entidad}Service.cs  # Servicio de datos para la entidad
 
 GCatcode.DataBase/         # Capa de acceso a datos
+├── Models/                # Modelos de datos (entidades)
+|   ├── {Entidad}.cs          # Modelo de cada entidad
+|   └── BaseModel.cs           # Propiedades comunes (Available, CreateTime, LastUpdated)
+├── Migrations/             # Migraciones de Entity Framework
+├── Configuration/          # Configuración de la base de datos
+|   ├── Builder{Entidad}s.cs  # Configuración Builder para cada entidad
+|   └── BuilderBase.cs          # Configuración base común
 └── AppDBContext.cs       # Contexto de Entity Framework
 
 GCatcode.Utils/            # Utilidades compartidas
@@ -136,7 +153,7 @@ TestUnit/                  # Proyecto de pruebas unitarias
 
 1. **Usar extensiones**: Desde `GCatcode.Utils.Extensions`
 2. **Validar temprano**: Fallar rápido con excepciones descriptivas
-3. **Mensajes estandarizados**: Retornar mensajes de error que existan en el enumerable `{Entity}ResponseMessage` de cada directorio del controlador o `ResponseMessageCommon` en Core.
+3. **Mensajes estandarizados**: Retornar mensajes de error que existan en `{Entity}Response.cs` de cada directorio del controlador.
 
 ### Al Trabajar con Autenticación
 

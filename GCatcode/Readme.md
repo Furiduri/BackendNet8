@@ -17,14 +17,16 @@ Backend desarrollado en .NET 8 con arquitectura en capas, sistema de autenticaci
 
 ## ✨ Características
 
-- 🔐 **Autenticación JWT**: Sistema completo de autenticación con tokens JWT
+- 🔐 **Autenticación JWT**: Sistema completo de autenticación con tokens JWT y Refresh Tokens
+- 👤 **Registro de Usuarios**: Endpoint para registro de nuevos usuarios
 - 👥 **Gestión de Usuarios**: CRUD completo de usuarios con cambio de contraseña
-- 🛡️ **Sistema de Roles**: Gestión de roles y permisos
+- 🛡️ **Sistema de Roles**: Gestión de roles y permisos con relación usuarios-roles
+- 🔄 **Refresh Tokens**: Sistema de renovación automática de tokens con gestión de expiración
 - 🗄️ **Entity Framework Core**: ORM para manejo de base de datos
-- 🎯 **Dapper**: Para consultas optimizadas
+- 🎯 **Dapper**: Para consultas SQL optimizadas
 - 📊 **SQL Server**: Base de datos en contenedor Docker
 - 📝 **Swagger**: Documentación interactiva de la API
-- 🔄 **CORS**: Configurado para desarrollo frontend
+- 🌐 **CORS**: Configurado para desarrollo frontend
 
 ## 🛠️ Tecnologías
 
@@ -44,15 +46,27 @@ BackendNet8/
 ├── GCatcode.Api/                    # Capa de presentación (API)
 │   ├── Controllers/                 # Controladores de la API
 │   │   ├── Roles/                  # Gestión de roles
-│   │   └── Users/                  # Gestión de usuarios
+│   │   ├── Users/                  # Gestión de usuarios
+│   │   └── TestController.cs       # Controlador de pruebas
 │   ├── Core/                       # Funcionalidades core
 │   │   ├── Auth/                   # Autenticación y autorización
+│   │   │   ├── Models/            # Modelos de autenticación
+│   │   │   ├── AuthController.cs  # Controlador de autenticación
+│   │   │   ├── AuthMethods.cs     # Lógica de autenticación
+│   │   │   └── AuthResponse.cs    # Respuestas de autenticación
+│   │   ├── BaseResponse.cs        # Respuesta base para la API
 │   │   ├── BaseController.cs      # Controlador base
 │   │   └── ApiResponse.cs         # Respuestas estandarizadas
 │   └── Configuration/              # Configuración de la aplicación
+│       └── AppSettings.cs          # Configuración global
 │
 ├── GCatcode.DataBase/              # Capa de acceso a datos (EF Core)
 │   ├── Models/                     # Entidades del dominio
+│   │   ├── BaseModel.cs           # Modelo base con propiedades comunes
+│   │   ├── User.cs                # Entidad de usuario
+│   │   ├── Rol.cs                 # Entidad de rol
+│   │   ├── UserRol.cs             # Relación usuarios-roles
+│   │   └── RefreshToken.cs        # Entidad de refresh tokens
 │   ├── Configurations/             # Configuraciones de EF Core
 │   ├── Migrations/                 # Migraciones de BD
 │   └── AppDBContext.cs            # Contexto de base de datos
@@ -61,7 +75,9 @@ BackendNet8/
 │   └── DB/                        # Servicios de base de datos
 │       ├── UserServices/          # Servicios de usuarios
 │       ├── RolServices/           # Servicios de roles
-│       └── UserRolServices/       # Relación usuarios-roles
+│       ├── UserRolServices/       # Relación usuarios-roles
+│       ├── RefreshTokenServices/  # Servicios de refresh tokens
+│       └── DBService.cs           # Servicio base de BD
 │
 ├── Utils/                          # Utilidades compartidas
 │   └── GCatcode.Utils.csproj
@@ -111,19 +127,30 @@ La configuración de JWT se encuentra en `appsettings.json`:
 ```json
 {
   "Jwt": {
-    "Key": "tu-clave-secreta-aqui",
+    "Key": "9UVsQ6Lm0fpi/Ty7dHFpWl9r3rIohurX3/qNm/HDQNE=",
     "Issuer": "Gcatcode.com",
-    "Audience": "Gcatcode.com"
+    "Audience": "Gcatcode.com",
+    "AccessTokenExpirationMinutes": 60,
+    "RefreshTokenExpirationDays": 7
   }
 }
 ```
+
+**Configuración por Entorno:**
+- **Producción**: Access Token expira en 60 minutos
+- **Desarrollo**: Access Token expira en 15 minutos
+- **Refresh Token**: 7 días en ambos entornos
 
 ### 3. CORS
 
 El frontend está configurado para ejecutarse en:
 - `http://localhost:5173` (Vite/React)
+- `http://localhost:7185`
+- `https://localhost:5173`
 
-Puedes modificar los orígenes permitidos en `Program.cs`.
+La configuración de CORS permite credenciales (`AllowCredentials`) para el manejo de cookies y refresh tokens.
+
+Puedes modificar los orígenes permitidos en `Program.cs` en la política `CorsPolicy`.
 
 ## 🎮 Ejecución
 
@@ -187,7 +214,9 @@ dotnet ef database update NombreMigracionAnterior --project GCatcode.DataBase/GC
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| POST | `/api/Auth/login` | Iniciar sesión y obtener JWT | No |
+| POST | `/api/Auth/login` | Iniciar sesión y obtener JWT + Refresh Token | No |
+| POST | `/api/Auth/register` | Registrar nuevo usuario y obtener JWT | No |
+| POST | `/api/Auth/refresh` | Renovar access token usando refresh token | No |
 | GET | `/api/Auth/user_info` | Obtener información del usuario actual | Sí |
 
 ### Usuarios
@@ -212,12 +241,33 @@ dotnet ef database update NombreMigracionAnterior --project GCatcode.DataBase/GC
 
 ### Ejemplo de Login
 
+**Solicitud:**
 ```bash
 curl -X POST https://localhost:7000/api/Auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
     "password": "password123"
+  }'
+```
+
+**Respuesta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "a1b2c3d4e5f6...",
+  "expiresAt": "2025-02-08T18:30:00Z"
+}
+```
+
+### Ejemplo de Refresh Token
+
+**Solicitud:**
+```bash
+curl -X POST https://localhost:7000/api/Auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "a1b2c3d4e5f6..."
   }'
 ```
 
@@ -255,21 +305,25 @@ docker rm -f BaseLine
 
 ## 📝 Notas de Desarrollo
 
-- La API usa **autenticación JWT Bearer**
+- La API usa **autenticación JWT Bearer** con refresh tokens
 - Las contraseñas deben enviarse en formato **Base64**
 - Los endpoints protegidos requieren el header: `Authorization: Bearer {token}`
+- El sistema de refresh tokens permite renovar el access token sin volver a hacer login
+- Los refresh tokens expiran en 7 días y se almacenan en la base de datos
 - El entorno de desarrollo tiene validaciones JWT relajadas para facilitar el desarrollo
-- CORS está habilitado para `http://localhost:5173`
+- CORS está habilitado para múltiples orígenes de desarrollo con soporte para credenciales
 
 ## 🔒 Seguridad
 
 ⚠️ **Importante para Producción:**
-- Cambiar la clave JWT en `appsettings.json`
-- Usar secretos de Azure Key Vault o variables de entorno
+- Cambiar la clave JWT en `appsettings.json` (nunca usar la clave por defecto)
+- Usar secretos de Azure Key Vault o variables de entorno para datos sensibles
 - Modificar la contraseña de SQL Server
-- Habilitar validaciones JWT completas
-- Configurar HTTPS correctamente
-- Revisar políticas de CORS
+- Habilitar todas las validaciones JWT (`ValidateIssuer`, `ValidateAudience`, etc.)
+- Configurar HTTPS correctamente con certificados válidos
+- Revisar y restringir políticas de CORS según los dominios permitidos
+- Implementar rate limiting para prevenir ataques de fuerza bruta
+- Los refresh tokens deben limpiarse periódicamente de la base de datos (tokens expirados)
 
 ## 📄 Licencia
 
@@ -286,5 +340,5 @@ Este es un proyecto privado. Las contribuciones están restringidas a colaborado
 
 ---
 
-**Versión:** 0.1.0  
-**Última actualización:** Febrero 2026
+**Versión:** 0.1.1  
+**Última actualización:** Febrero 2025
