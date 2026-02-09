@@ -6,7 +6,7 @@ namespace GCatcode.DataBase
     public class BaseModel
     {
         [Required, DefaultValue(true)]
-        public bool Available { get; set; }
+        public bool Available { get; set; } = true;
 
         [Required]
         public DateTime LastUpdated { get; set; }

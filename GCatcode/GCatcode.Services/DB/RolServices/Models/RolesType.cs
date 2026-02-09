@@ -2,9 +2,9 @@
 {
     public enum RolesType
     {
-        Dev = 0,
-        Guest = 1,
-        User = 2,
-        Admin = 3
+        Dev = 1,
+        Guest = 2,
+        User = 3,
+        Admin = 4
     }
 }

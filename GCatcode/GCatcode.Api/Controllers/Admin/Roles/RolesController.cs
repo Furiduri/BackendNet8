@@ -4,10 +4,10 @@ using GCatcode.Repository.DB.RolServices.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GCatcode.Api.Controllers.Roles
+namespace GCatcode.Api.Controllers.Admin.Roles
 {
     [Authorize]
-    [ApiController, Route("api/[controller]")]
+    [ApiController, Route("admin/[controller]")]
     public class RolesController : BaseController
     {
         private readonly RolesMethods _methods;

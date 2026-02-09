@@ -4,7 +4,7 @@ namespace GCatcode.Utils
 {
     public class SQLUtils
     {
-        public static string ParseWere(object? filters)
+        public static string ParseWere(object filters)
         {
             string were = "";
             if (filters != null)

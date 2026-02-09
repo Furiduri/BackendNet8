@@ -4,7 +4,7 @@ using GCatcode.Repository.DB.RolServices;
 using GCatcode.Repository.DB.RolServices.Models;
 using Microsoft.Data.SqlClient;
 
-namespace GCatcode.Api.Controllers.Roles
+namespace GCatcode.Api.Controllers.Admin.Roles
 {
     public class RolesMethods
     {

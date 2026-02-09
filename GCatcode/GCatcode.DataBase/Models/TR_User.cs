@@ -4,7 +4,8 @@ using System.ComponentModel.DataAnnotations;
 namespace GCatcode.DataBase.Models
 {
     [Index(nameof(UserName), IsUnique = true)]
-    public class User : BaseModel
+    [Index(nameof(Email), IsUnique = true)]
+    public class TR_User : BaseModel
     {
         [Required, Key]
         public int UserId { get; set; }
@@ -18,6 +19,6 @@ namespace GCatcode.DataBase.Models
         [Required]
         public string Password { get; set; }
 
-        public IEnumerable<UserRol> UserRoles { get; internal set; }
+        public IEnumerable<RL_UserRol> UserRoles { get; internal set; }
     }
 }

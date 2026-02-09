@@ -43,7 +43,7 @@ GCatcode.Repository/       # Capa de lógica de negocio
 
 GCatcode.DataBase/         # Capa de acceso a datos
 ├── Models/                # Modelos de datos (entidades)
-|   ├── {Entidad}.cs          # Modelo de cada entidad
+|   ├── {TypeTable}_{Entidad}.cs          # Modelo de cada entidad
 |   └── BaseModel.cs           # Propiedades comunes (Available, CreateTime, LastUpdated)
 ├── Migrations/             # Migraciones de Entity Framework
 ├── Configuration/          # Configuración de la base de datos
@@ -104,6 +104,13 @@ TestUnit/                  # Proyecto de pruebas unitarias
 - **Entity Framework Core**: No usar mas que para migraciones o actualización de esquema
 - **Dapper**: Para consultas de alto rendimiento
 - **Proveedor**: Microsoft SQL Server
+
+### Tipo de tablas
+Los tipos de tablas se clasifican en tres categorías según su uso y patrón de acceso:
+
+- **CL**: Tablas de catálogo, mucha lectura, poca escritura (Roles, Controller, View, etc.)
+- **RL**: Tablas de relación, lectura y escritura moderada (UserRoles, etc.)
+- **TR**: Tablas transaccionales, muchas escrituras (Users, etc.)
 
 ### Entidades Principales
 

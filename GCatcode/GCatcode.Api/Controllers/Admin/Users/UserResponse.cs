@@ -1,7 +1,7 @@
 ﻿using GCatcode.Api.Core;
 using System.Net;
 
-namespace GCatcode.Api.Controllers.Users
+namespace GCatcode.Api.Controllers.Admin.Users
 {
     public class UserResponse : BaseResponse
     {

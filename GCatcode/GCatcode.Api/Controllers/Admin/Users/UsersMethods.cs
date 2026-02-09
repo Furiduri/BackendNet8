@@ -7,7 +7,7 @@ using GCatcode.Repository.DB.UserServices.Models;
 using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 
-namespace GCatcode.Api.Controllers.Users
+namespace GCatcode.Api.Controllers.Admin.Users
 {
     public class UsersMethods
     {

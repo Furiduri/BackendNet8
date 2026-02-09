@@ -1,6 +1,6 @@
 ﻿using GCatcode.Api.Core;
 
-namespace GCatcode.Api.Controllers.Roles
+namespace GCatcode.Api.Controllers.Admin.Roles
 {
     public class RolesResponse : BaseResponse
     {

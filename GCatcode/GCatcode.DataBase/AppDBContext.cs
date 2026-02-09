@@ -5,23 +5,24 @@ using Microsoft.EntityFrameworkCore;
 namespace GCatcode.DataBase
 {
     public class AppDBContext : DbContext
-    {
-        public DbSet<Rol> Roles { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserRol> UserRoles { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-
+    {        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new BuilderUsers());
             modelBuilder.ApplyConfiguration(new BuilderRoles());
-            modelBuilder.ApplyConfiguration(new BuilderUserRol());
+            modelBuilder.ApplyConfiguration(new BuilderUserRoles());
             modelBuilder.ApplyConfiguration(new BuilderRefreshTokens());
+            modelBuilder.ApplyConfiguration(new BuilderControllers());
+            modelBuilder.ApplyConfiguration(new BuilderControllerMethods());
+            modelBuilder.ApplyConfiguration(new BuilderViews());
+            modelBuilder.ApplyConfiguration(new BuilderViewRoles());
+            modelBuilder.ApplyConfiguration(new BuilderViewControllers());            
         }
 
         public AppDBContext(DbContextOptions<AppDBContext> options)
             : base(options)
-        {
+        {           
+            
         }
     }
 }

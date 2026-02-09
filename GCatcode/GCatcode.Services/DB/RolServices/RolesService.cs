@@ -20,13 +20,13 @@ namespace GCatcode.Repository.DB.RolServices
 
         public RolDTO? GetById(int id)
         {
-            return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[Roles] WHERE RolId = @id", new { id }, Transaction);
+            return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @id", new { id }, Transaction);
         }
 
         public IEnumerable<RolDTO> Get(int page = 1, RolFilter? filters = null, int maxItems = 100)
         {
             return DbConnection.Query<RolDTO>($@"SELECT *
-                    FROM [dbo].[Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}
+                    FROM [dbo].[CL_Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}
                     ORDER BY RolId
                     OFFSET {((page - 1) * maxItems)} ROWS"
                     , filters, Transaction);
@@ -35,11 +35,11 @@ namespace GCatcode.Repository.DB.RolServices
         public RolDTO Delete(int id)
         {
             return DbConnection.QueryFirst<RolDTO>(
-                   $@"UPDATE [dbo].[Roles]
+                   $@"UPDATE [dbo].[CL_Roles]
                         SET Available = 0,
                             LastUpdated = @dateTime
                         WHERE RolId = @RolId
-                        SELECT * FROM [dbo].[Roles] WHERE RolId = @id
+                        SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @id
             ",
             new
             {
@@ -51,13 +51,13 @@ namespace GCatcode.Repository.DB.RolServices
         public RolDTO Update(RolUpdate data)
         {
             return DbConnection.QueryFirst<RolDTO>(
-                $@"UPDATE [dbo].[Roles]
+                $@"UPDATE [dbo].[CL_Roles]
                         SET Name = @Name,
                             Description = @Description,
                             Available = @Available,
                             LastUpdated = @dateTime
                         WHERE RolId = @RolId
-                        SELECT * FROM [dbo].[Roles] WHERE RolId = @RolId
+                        SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @RolId
                         ",
                 new
                 {
@@ -73,9 +73,9 @@ namespace GCatcode.Repository.DB.RolServices
         {
             return DbConnection.QueryFirst<RolDTO>(
                 $@"
-                        INSERT INTO [dbo].[Roles] (Name, Description)
+                        INSERT INTO [dbo].[CL_Roles] (Name, Description)
                         VALUES (@Name, @Description)
-                        SELECT * FROM [dbo].[Roles] WHERE RolId = @@IDENTITY
+                        SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @@IDENTITY
                         ",
                 new
                 {
@@ -88,8 +88,8 @@ namespace GCatcode.Repository.DB.RolServices
         {
             return DbConnection.Query<RolItem>($@"
                     SELECT r.*
-                    FROM [dbo].[Roles] r
-                    INNER JOIN [dbo].[UserRoles] ur ON r.RolId = ur.RolId
+                    FROM [dbo].[CL_Roles] r
+                    INNER JOIN [dbo].[RL_UserRoles] ur ON r.RolId = ur.RolId
                     WHERE ur.UserId = @userId
                     ", new { userId }, Transaction);
         }

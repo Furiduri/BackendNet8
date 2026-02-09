@@ -1,5 +1,5 @@
 ﻿using GCatcode.Api.Configuration;
-using GCatcode.Api.Controllers.Users;
+using GCatcode.Api.Controllers.Admin.Users;
 using GCatcode.Api.Core.Auth.Models;
 using GCatcode.Repository.DB.RefreshTokenServices;
 using GCatcode.Repository.DB.RefreshTokenServices.Models;

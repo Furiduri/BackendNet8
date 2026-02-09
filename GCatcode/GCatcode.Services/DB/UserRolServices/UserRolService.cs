@@ -21,11 +21,11 @@ namespace GCatcode.Repository.DB.UserRolServices
         public UserRolDTO Delete(int UserId, int RolId)
         {
             return DbConnection.QueryFirst<UserRolDTO>(
-                @"UPDATE [dbo].[UserRoles]
+                @"UPDATE [dbo].[RL_UserRoles]
                     SET Available = 0,
                         LastUpdated = @dateTime
                     WHERE UserId = @UserId AND RolId = @RolId
-                    SELECT * FROM [dbo].[UserRoles] WHERE UserId = @UserId AND RolId = @RolId
+                    SELECT * FROM [dbo].[RL_UserRoles] WHERE UserId = @UserId AND RolId = @RolId
                 ",
                 new
                 {
@@ -38,8 +38,8 @@ namespace GCatcode.Repository.DB.UserRolServices
         public IEnumerable<RolItem> GetRolsByUserId(int userId)
         {
             return DbConnection.Query<RolItem>(
-                @"SELECT r.* FROM [dbo].[UserRoles] ur
-                    INNER JOIN [dbo].[Roles] r ON ur.RolId = r.RolId AND r.Available = 1
+                @"SELECT r.* FROM [dbo].[RL_UserRoles] ur
+                    INNER JOIN [dbo].[CL_Roles] r ON ur.RolId = r.RolId AND r.Available = 1
                     WHERE ur.UserId = @userId
                 ",
                 new { userId }, Transaction);
@@ -48,15 +48,15 @@ namespace GCatcode.Repository.DB.UserRolServices
         public UserRolDTO Insert(UserRolDTO data)
         {
             return DbConnection.QueryFirst<UserRolDTO>(
-                @"IF EXISTS(SELECT * FROM UserRoles WHERE UserId = @UserId AND RolId = @RolId) BEGIN
-	                UPDATE [dbo].[UserRoles]
+                @"IF EXISTS(SELECT * FROM [dbo].[RL_UserRoles] WHERE UserId = @UserId AND RolId = @RolId) BEGIN
+	                UPDATE [dbo].[RL_UserRoles]
                     SET Available = 1,
                         LastUpdated = @dateTime
                     WHERE UserId = @UserId AND RolId = @RolId
                 END ELSE BEGIN
-	                INSERT INTO [dbo].[UserRoles] (UserId, RolId, Available, LastUpdated) VALUES (@UserId, @RolId, 1, @dateTime)
+	                INSERT INTO [dbo].[RL_UserRoles] (UserId, RolId, Available, LastUpdated) VALUES (@UserId, @RolId, 1, @dateTime)
                 END
-                SELECT * FROM [dbo].[UserRoles] WHERE UserId = @UserId AND RolId = @RolId", new { data.UserId, data.RolId, dateTime = DateTime.UtcNow }, Transaction);
+                SELECT * FROM [dbo].[RL_UserRoles] WHERE UserId = @UserId AND RolId = @RolId", new { data.UserId, data.RolId, dateTime = DateTime.UtcNow }, Transaction);
         }
     }
 }

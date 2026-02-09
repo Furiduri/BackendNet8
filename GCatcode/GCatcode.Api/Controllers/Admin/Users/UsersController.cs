@@ -7,10 +7,10 @@ using GCatcode.Utils.GenericModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GCatcode.Api.Controllers.Users
+namespace GCatcode.Api.Controllers.Admin.Users
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("admin/[controller]")]
     [ApiController]
     public class UsersController : BaseController
     {

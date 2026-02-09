@@ -7,7 +7,7 @@ namespace GCatcode.DataBase.Models
     [Index(nameof(Token), IsUnique = true)]
     [Index(nameof(UserId))]
     [Index(nameof(ExpiryDate), nameof(IsRevoked))]
-    public class RefreshToken : BaseModel
+    public class TR_RefreshToken
     {
         [Key]
         public int RefreshTokenId { get; set; }
@@ -40,7 +40,7 @@ namespace GCatcode.DataBase.Models
 
         // Navigation property
         [ForeignKey(nameof(UserId))]
-        public User User { get; set; }
+        public TR_User User { get; set; }
 
         // Computed properties
         [NotMapped]
