@@ -359,11 +359,27 @@ namespace GCatcode.DataBase.Migrations
                 table: "TR_Users",
                 column: "UserName",
                 unique: true);
+
+            migrationBuilder.Sql(@"CREATE OR ALTER PROCEDURE [dbo].[sp_CleanExpiredRefreshTokens]
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    DECLARE @DeletedCount INT;
+
+                    DELETE FROM [dbo].[TR_RefreshTokens]
+                    WHERE ExpiryDate < GETUTCDATE();
+
+                    SET @DeletedCount = @@ROWCOUNT;
+
+                    PRINT CONCAT('Tokens expirados eliminados: ', @DeletedCount);
+                END");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@"DROP PROCEDURE IF EXISTS [dbo].[sp_CleanExpiredRefreshTokens]");
             migrationBuilder.DropTable(
                 name: "CL_ControllerMethods");
 

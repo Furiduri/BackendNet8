@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GCatcode.Api.Controllers.Admin.Roles
 {
     [Authorize]
-    [ApiController, Route("admin/[controller]")]
+    [ApiController, Route("api/admin/[controller]")]
     public class RolesController : BaseController
     {
         private readonly RolesMethods _methods;

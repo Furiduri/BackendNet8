@@ -1,13 +1,13 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core.Auth.Models;
 using GCatcode.Repository.DB.UserServices;
+using GCatcode.Utils.GenericModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Core.Auth
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]")]
     public class AuthController : BaseController
     {
         private readonly AuthMethods _methods;
@@ -19,7 +19,7 @@ namespace GCatcode.Api.Core.Auth
         }
 
         [Authorize]
-        [HttpGet("user_info")]
+        [HttpGet]
         [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
         public ActionResult GetUserInfo()
         {
@@ -111,7 +111,7 @@ namespace GCatcode.Api.Core.Auth
         /// <param name="request">Refresh token to revoke</param>
         /// <returns>Success message</returns>
         [HttpPost("revoke")]
-        [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+        [ProducesResponseType<GenericMessage>(StatusCodes.Status200OK)]
         public IActionResult RevokeToken([FromBody] RefreshTokenRequest request)
         {
             try

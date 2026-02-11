@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GCatcode.Api.Controllers.Admin.Users
 {
     [Authorize]
-    [Route("admin/[controller]")]
-    [ApiController]
+    [ApiController, Route("api/admin/[controller]")]
     public class UsersController : BaseController
     {
         private readonly UsersMethods _methods;

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace GCatcode.Api.Core
 {
-    public class ApiResponse<T>
+    public class ApiResponse<T> where T : class
     {
         public bool IsSuccess { get; set; }
 

@@ -7,6 +7,7 @@ using GCatcode.Repository.DB.RolServices;
 using GCatcode.Repository.DB.RolServices.Models;
 using GCatcode.Repository.DB.UserRolServices;
 using GCatcode.Repository.DB.UserServices;
+using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -37,9 +38,9 @@ namespace GCatcode.Api.Core.Auth
                 var roles = new RolesService(context).GetRolesByUserId(userId);
                 return ApiResponse<UserInfo>.SuccessResult(new UserInfo
                 {
+                    UserId = userId,
                     Email = userInfo.Email,
                     UserName = userInfo.UserName,
-                    UserId = userId,
                     Roles = roles
                 });
             }
@@ -198,7 +199,7 @@ namespace GCatcode.Api.Core.Auth
             }
         }
 
-        public ApiResponse<bool> RevokeToken(string token, string ipAddress)
+        public ApiResponse<GenericMessage> RevokeToken(string token, string ipAddress)
         {
             using (var context = new SqlConnection(_configuration.DB.DefaultConnection))
             {
@@ -208,17 +209,17 @@ namespace GCatcode.Api.Core.Auth
 
                 if (refreshToken == null || !refreshToken.IsActive)
                 {
-                    return ApiResponse<bool>.ErrorResult(AuthResponse.InvalidRefreshToken());
+                    return ApiResponse<GenericMessage>.ErrorResult(AuthResponse.InvalidRefreshToken());
                 }
 
                 var result = _refreshTokenService.RevokeToken(token, ipAddress);
 
                 if (result)
                 {
-                    return ApiResponse<bool>.SuccessResult(true, "Token revoked successfully");
+                    return ApiResponse<GenericMessage>.SuccessResult(new GenericMessage { Message = "Token revoked successfully" });
                 }
 
-                return ApiResponse<bool>.ErrorResult(AuthResponse.RevokeFailed());
+                return ApiResponse<GenericMessage>.ErrorResult(AuthResponse.RevokeFailed());
             }
         }
 
