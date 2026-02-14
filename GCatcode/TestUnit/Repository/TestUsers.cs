@@ -1,5 +1,6 @@
 ﻿using GCatcode.Repository.DB.UserServices;
 using GCatcode.Utils;
+using System.Buffers.Text;
 
 namespace TestUnit.Repository
 {
@@ -55,13 +56,13 @@ namespace TestUnit.Repository
                 var userInsert = new UserInsert
                 {
                     UserName = "TestUser_" + Guid.NewGuid().ToString().Substring(0, 8),
-                    Password = "TestPassword2.5!",
+                    Password = Argon2Helper.EncryptToBase64("TestPassword2.5!"),
                     Email = "TestEmail@test.com"
                 };
                 var user = userService.Add(userInsert);
                 Assert.IsNotNull(user);
                 var userWhitPassword = userService.GetUpdateById(user.UserId);
-                Assert.IsTrue(Argon2Helper.VerifyPassword(userInsert.Password, userWhitPassword.Password));
+                Assert.IsTrue(Argon2Helper.VerifyPassword(Argon2Helper.DecryptToBase64(userInsert.Password), userWhitPassword.Password));
             }
         }
     }

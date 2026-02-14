@@ -25,8 +25,8 @@ namespace GCatcode.Repository.DB.UserServices
 
         public GenericMessage ChangePassword(UserChangePassword data)
         {
-            data.OldPassword = DecryptToBase64(data.OldPassword);
-            data.NewPassword = DecryptToBase64(data.NewPassword);
+            data.OldPassword = Argon2Helper.DecryptToBase64(data.OldPassword);
+            data.NewPassword = Argon2Helper.DecryptToBase64(data.NewPassword);
 
             var user = GetUpdateById(data.UserId);
             if (user == null)
@@ -118,7 +118,7 @@ namespace GCatcode.Repository.DB.UserServices
 
         public UserDTO Add(UserInsert user)
         {
-            user.Password = DecryptToBase64(user.Password);
+            user.Password = Argon2Helper.DecryptToBase64(user.Password);
             ValidUser(user);
             string hashedPassword = Argon2Helper.HashPassword(user.Password);
 
@@ -170,7 +170,7 @@ namespace GCatcode.Repository.DB.UserServices
 
         public bool ValidPassword(UserLogin userLogin)
         {
-            userLogin.Password = DecryptToBase64(userLogin.Password);
+            userLogin.Password = Argon2Helper.DecryptToBase64(userLogin.Password);
             var userInDB = GetByEmail(userLogin.Email);
             if (userInDB == null)
             {
@@ -179,20 +179,6 @@ namespace GCatcode.Repository.DB.UserServices
             var user = GetUpdateById(userInDB.UserId);
 
             return Argon2Helper.VerifyPassword(userLogin.Password, user.Password);
-        }
-
-        private string DecryptToBase64(string password)
-        {
-            //En caso de que el password no este en base 64, se retorna tal cual
-            try
-            {
-                byte[] data = Convert.FromBase64String(password);
-                return System.Text.Encoding.UTF8.GetString(data);
-            }
-            catch
-            {
-                return password;
-            }
         }
 
         private void ValidUser(UserInsert user)

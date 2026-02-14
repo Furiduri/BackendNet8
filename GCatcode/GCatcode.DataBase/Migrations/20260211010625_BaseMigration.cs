@@ -14,42 +14,22 @@ namespace GCatcode.DataBase.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CL_ControllerMethods",
+                name: "CL_Permissions",
                 columns: table => new
                 {
-                    MethodId = table.Column<int>(type: "int", nullable: false)
+                    PermissionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ControllerId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    HttpMethod = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Endpoint = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    PermissionType = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Resource = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
                     CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CL_ControllerMethods", x => x.MethodId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CL_Controllers",
-                columns: table => new
-                {
-                    ControllerId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ControllerPath = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
-                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CL_Controllers", x => x.ControllerId);
+                    table.PrimaryKey("PK_CL_Permissions", x => x.PermissionId);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,26 +90,31 @@ namespace GCatcode.DataBase.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RL_ViewControllers",
+                name: "RL_RolePermissions",
                 columns: table => new
                 {
-                    ViewId = table.Column<int>(type: "int", nullable: false),
-                    ControllerId = table.Column<int>(type: "int", nullable: false)
+                    RolePermissionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RolId = table.Column<int>(type: "int", nullable: false),
+                    PermissionId = table.Column<int>(type: "int", nullable: false),
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RL_ViewControllers", x => new { x.ViewId, x.ControllerId });
+                    table.PrimaryKey("PK_RL_RolePermissions", x => x.RolePermissionId);
                     table.ForeignKey(
-                        name: "FK_RL_ViewControllers_CL_Controllers_ControllerId",
-                        column: x => x.ControllerId,
-                        principalTable: "CL_Controllers",
-                        principalColumn: "ControllerId",
+                        name: "FK_RL_RolePermissions_CL_Permissions_PermissionId",
+                        column: x => x.PermissionId,
+                        principalTable: "CL_Permissions",
+                        principalColumn: "PermissionId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RL_ViewControllers_CL_Views_ViewId",
-                        column: x => x.ViewId,
-                        principalTable: "CL_Views",
-                        principalColumn: "ViewId",
+                        name: "FK_RL_RolePermissions_CL_Roles_RolId",
+                        column: x => x.RolId,
+                        principalTable: "CL_Roles",
+                        principalColumn: "RolId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -154,6 +139,37 @@ namespace GCatcode.DataBase.Migrations
                         column: x => x.ViewId,
                         principalTable: "CL_Views",
                         principalColumn: "ViewId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RL_UserPermissions",
+                columns: table => new
+                {
+                    UserPermissionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    PermissionId = table.Column<int>(type: "int", nullable: false),
+                    IsGranted = table.Column<bool>(type: "bit", nullable: false),
+                    Conditions = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RL_UserPermissions", x => x.UserPermissionId);
+                    table.ForeignKey(
+                        name: "FK_RL_UserPermissions_CL_Permissions_PermissionId",
+                        column: x => x.PermissionId,
+                        principalTable: "CL_Permissions",
+                        principalColumn: "PermissionId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RL_UserPermissions_TR_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "TR_Users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -209,30 +225,22 @@ namespace GCatcode.DataBase.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "CL_ControllerMethods",
-                columns: new[] { "MethodId", "Available", "ControllerId", "CreateTime", "Description", "Endpoint", "HttpMethod", "LastUpdated", "Name", "PermissionType" },
+                table: "CL_Permissions",
+                columns: new[] { "PermissionId", "Action", "Available", "Code", "CreateTime", "Description", "LastUpdated", "Resource" },
                 values: new object[,]
                 {
-                    { 1, true, 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Listar usuarios", "/admin/Users", "GET", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "GetAll", 1 },
-                    { 2, true, 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Obtener usuario por ID", "/admin/Users/{id}", "GET", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "GetById", 1 },
-                    { 3, true, 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Crear usuario", "/admin/Users", "POST", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create", 2 },
-                    { 4, true, 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Actualizar usuario", "/admin/Users/{id}", "PUT", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update", 2 },
-                    { 5, true, 1, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eliminar usuario", "/admin/Users/{id}", "DELETE", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete", 3 },
-                    { 6, true, 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Listar roles", "/admin/Roles", "GET", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "GetAll", 1 },
-                    { 7, true, 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Obtener rol por ID", "/admin/Roles/{id}", "GET", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "GetById", 1 },
-                    { 8, true, 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Crear rol", "/admin/Roles", "POST", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Create", 2 },
-                    { 9, true, 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Actualizar rol", "/admin/Roles/{id}", "PUT", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Update", 2 },
-                    { 10, true, 2, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eliminar rol", "/admin/Roles/{id}", "DELETE", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Delete", 3 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "CL_Controllers",
-                columns: new[] { "ControllerId", "Available", "ControllerPath", "CreateTime", "Description", "LastUpdated", "Name" },
-                values: new object[,]
-                {
-                    { 1, true, "admin/users", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Controller for users management", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "UsersController" },
-                    { 2, true, "admin/roles", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Controller for roles management", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "RolesController" },
-                    { 3, true, "admin/permissions", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Controller for permissions management", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "PermissionsController" }
+                    { 1, "read", true, "users.read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ver usuarios", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "users" },
+                    { 2, "write", true, "users.write", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Crear/Editar usuarios", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "users" },
+                    { 3, "delete", true, "users.delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eliminar usuarios", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "users" },
+                    { 4, "read", true, "roles.read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ver roles", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "roles" },
+                    { 5, "write", true, "roles.write", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Crear/Editar roles", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "roles" },
+                    { 6, "delete", true, "roles.delete", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eliminar roles", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "roles" },
+                    { 7, "read", true, "permissions.read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ver permisos", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "permissions" },
+                    { 8, "write", true, "permissions.write", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Asignar permisos", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "permissions" },
+                    { 9, "read", true, "views.read", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ver vistas/menús", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "views" },
+                    { 10, "write", true, "views.write", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Gestionar vistas/menús", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "views" },
+                    { 11, "admin", true, "system.admin", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Administración total del sistema", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "system" },
+                    { 12, "config", true, "system.config", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Configurar sistema", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "system" }
                 });
 
             migrationBuilder.InsertData(
@@ -251,7 +259,7 @@ namespace GCatcode.DataBase.Migrations
                 columns: new[] { "ViewId", "Available", "CreateTime", "Description", "Icon", "IsActive", "LastUpdated", "Name", "Order", "ParentViewId", "Route" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "DashboardIcon", true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Dashboard", 1, null, "/dashboard" },
+                    { 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "", "DashboardIcon", true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Dashboard", 1, null, "/dashboard" },
                     { 2, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "View for Adim tools", "admin", true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Admin", 0, null, "admin" },
                     { 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "View for users management", "user", true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Users", 0, 1, "admin/users" },
                     { 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "View for roles management", "list", true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Roles", 0, 1, "admin/roles" },
@@ -263,10 +271,42 @@ namespace GCatcode.DataBase.Migrations
                 columns: new[] { "UserId", "Available", "CreateTime", "Email", "LastUpdated", "Password", "UserName" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "dev@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "bDN+lqTwOni3VvDVCpMZ/fdIOeLJWI4xr/pBMFxpmXrM2eKXisTjyE3Jl22qlVez", "Dev" },
-                    { 2, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "guest@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ovs8iCBxayixik0xCdcm9juL4VTn7mJeScrfiWEyZdXRZi9N7pWb5qZoY4Ry+dpL", "Guest" },
-                    { 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "user@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "LVrRLFuwP0EOJ9QAkhoWJFx8tab4KxUrGo1ME8wZRWHvM2saRRM3yAl1wLdBkPsu", "User" },
-                    { 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "pUoDuxUl0hWFYdvT+8Jg7TbBM6e634yhjrLE19bOTdODOpLoU8a3RRJIvhs2zAmf", "Admin" }
+                    { 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "dev@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "B8u/V5sy0wC7ZQSCtBSQqnl82wdSzXwjeVFpjzkNI4QPB8t0RMkHMV71/qRkgKJ0", "Dev" },
+                    { 2, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "guest@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "X3ZupnMNsxBnNefH1y+u+GLpvG07hz3cRN7C/NlP7wJDL/QniwW+TkEnqPb2jwtJ", "Guest" },
+                    { 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "user@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "NQ+/TPuJltbMz2S/Anq+K/OQq6NRUtJ1iTEYN+sDTqQ2GmGHaxnhxaGiOWY197Bc", "User" },
+                    { 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ax6nHg2mDM1aYEdX0Sh8wTPw90jQuF2+iDqu2IjyvgbBTpGNzigf4WuO98nTgB6n", "Admin" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "RL_RolePermissions",
+                columns: new[] { "RolePermissionId", "Available", "CreateTime", "LastUpdated", "PermissionId", "RolId" },
+                values: new object[,]
+                {
+                    { 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, 1 },
+                    { 2, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, 1 },
+                    { 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, 1 },
+                    { 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4, 1 },
+                    { 5, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 5, 1 },
+                    { 6, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 6, 1 },
+                    { 7, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 7, 1 },
+                    { 8, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 8, 1 },
+                    { 9, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 9, 1 },
+                    { 10, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 10, 1 },
+                    { 11, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 11, 1 },
+                    { 12, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 12, 1 },
+                    { 13, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, 4 },
+                    { 14, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2, 4 },
+                    { 15, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3, 4 },
+                    { 16, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4, 4 },
+                    { 17, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 5, 4 },
+                    { 18, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 7, 4 },
+                    { 19, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 8, 4 },
+                    { 20, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 9, 4 },
+                    { 21, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 10, 4 },
+                    { 22, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1, 3 },
+                    { 23, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4, 3 },
+                    { 24, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 9, 3 },
+                    { 25, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 9, 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -281,16 +321,6 @@ namespace GCatcode.DataBase.Migrations
                     { 2, 2 },
                     { 3, 3 },
                     { 4, 4 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "RL_ViewControllers",
-                columns: new[] { "ControllerId", "ViewId" },
-                values: new object[,]
-                {
-                    { 1, 3 },
-                    { 2, 4 },
-                    { 3, 5 }
                 });
 
             migrationBuilder.InsertData(
@@ -311,20 +341,42 @@ namespace GCatcode.DataBase.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CL_ControllerMethods_ControllerId_Name",
-                table: "CL_ControllerMethods",
-                columns: new[] { "ControllerId", "Name" },
+                name: "IX_CL_Permissions_Code",
+                table: "CL_Permissions",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CL_Permissions_Resource_Action",
+                table: "CL_Permissions",
+                columns: new[] { "Resource", "Action" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RL_RolePermissions_PermissionId",
+                table: "RL_RolePermissions",
+                column: "PermissionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RL_RolePermissions_RolId_PermissionId",
+                table: "RL_RolePermissions",
+                columns: new[] { "RolId", "PermissionId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RL_UserPermissions_PermissionId",
+                table: "RL_UserPermissions",
+                column: "PermissionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RL_UserPermissions_UserId_PermissionId",
+                table: "RL_UserPermissions",
+                columns: new[] { "UserId", "PermissionId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_RL_UserRoles_RolId",
                 table: "RL_UserRoles",
                 column: "RolId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RL_ViewControllers_ControllerId",
-                table: "RL_ViewControllers",
-                column: "ControllerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RL_ViewRoles_RolId",
@@ -359,35 +411,19 @@ namespace GCatcode.DataBase.Migrations
                 table: "TR_Users",
                 column: "UserName",
                 unique: true);
-
-            migrationBuilder.Sql(@"CREATE OR ALTER PROCEDURE [dbo].[sp_CleanExpiredRefreshTokens]
-                AS
-                BEGIN
-                    SET NOCOUNT ON;
-
-                    DECLARE @DeletedCount INT;
-
-                    DELETE FROM [dbo].[TR_RefreshTokens]
-                    WHERE ExpiryDate < GETUTCDATE();
-
-                    SET @DeletedCount = @@ROWCOUNT;
-
-                    PRINT CONCAT('Tokens expirados eliminados: ', @DeletedCount);
-                END");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"DROP PROCEDURE IF EXISTS [dbo].[sp_CleanExpiredRefreshTokens]");
             migrationBuilder.DropTable(
-                name: "CL_ControllerMethods");
+                name: "RL_RolePermissions");
+
+            migrationBuilder.DropTable(
+                name: "RL_UserPermissions");
 
             migrationBuilder.DropTable(
                 name: "RL_UserRoles");
-
-            migrationBuilder.DropTable(
-                name: "RL_ViewControllers");
 
             migrationBuilder.DropTable(
                 name: "RL_ViewRoles");
@@ -396,7 +432,7 @@ namespace GCatcode.DataBase.Migrations
                 name: "TR_RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "CL_Controllers");
+                name: "CL_Permissions");
 
             migrationBuilder.DropTable(
                 name: "CL_Roles");

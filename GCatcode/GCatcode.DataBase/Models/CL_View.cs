@@ -8,16 +8,16 @@ namespace GCatcode.DataBase.Models
         public int ViewId { get; set; }
 
         [Required, MaxLength(100)]
-        public string Name { get; set; } 
+        public string Name { get; set; } = string.Empty;
 
         [Required, MaxLength(200)]
-        public string Route { get; set; }
+        public string Route { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string Icon { get; set; } 
+        public string Icon { get; set; } = string.Empty;
 
         [MaxLength(500)]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         public int? ParentViewId { get; set; } 
 
@@ -25,7 +25,6 @@ namespace GCatcode.DataBase.Models
 
         public bool IsActive { get; set; } = true;
 
-        public IEnumerable<RL_ViewRol> ViewRols { get; internal set; }
-        public IEnumerable<RL_ViewController> ViewControllers { get; internal set; }
+        public IEnumerable<RL_ViewRol> ViewRols { get; internal set; } = new List<RL_ViewRol>();
     }
 }

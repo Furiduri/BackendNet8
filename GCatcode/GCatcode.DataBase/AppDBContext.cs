@@ -12,11 +12,13 @@ namespace GCatcode.DataBase
             modelBuilder.ApplyConfiguration(new BuilderRoles());
             modelBuilder.ApplyConfiguration(new BuilderUserRoles());
             modelBuilder.ApplyConfiguration(new BuilderRefreshTokens());
-            modelBuilder.ApplyConfiguration(new BuilderControllers());
-            modelBuilder.ApplyConfiguration(new BuilderControllerMethods());
             modelBuilder.ApplyConfiguration(new BuilderViews());
             modelBuilder.ApplyConfiguration(new BuilderViewRoles());
-            modelBuilder.ApplyConfiguration(new BuilderViewControllers());            
+            
+            // Configuraciones para RBAC + ABAC
+            modelBuilder.ApplyConfiguration(new BuilderPermissions());
+            modelBuilder.ApplyConfiguration(new BuilderRolePermissions());
+            modelBuilder.ApplyConfiguration(new BuilderUserPermissions());
         }
 
         public AppDBContext(DbContextOptions<AppDBContext> options)

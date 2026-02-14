@@ -71,5 +71,24 @@ namespace GCatcode.Utils
                 return false;
             }
         }
+
+        public static string DecryptToBase64(string password)
+        {
+            try
+            {
+                byte[] data = Convert.FromBase64String(password);
+                return System.Text.Encoding.UTF8.GetString(data);
+            }
+            catch
+            {
+                return password;
+            }
+        }
+
+        public static string EncryptToBase64(string password)
+        {
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(password);
+            return Convert.ToBase64String(data);
+        }
     }
 }
