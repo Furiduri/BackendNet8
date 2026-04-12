@@ -10,10 +10,7 @@ namespace GCatcode.DataBase.Configurations
         {
             Base(builder);
             builder.ToTable("TR_Users");
-            
-            // Fecha fija para el seed inicial
-            var seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            
+                        
             builder.HasData([
                 new TR_User { 
                     UserId = 1, 

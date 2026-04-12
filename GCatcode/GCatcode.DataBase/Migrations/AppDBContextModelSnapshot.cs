@@ -728,6 +728,21 @@ namespace GCatcode.DataBase.Migrations
                     b.Property<int>("RolId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
                     b.HasKey("UserId", "RolId");
 
                     b.HasIndex("RolId");
@@ -738,37 +753,42 @@ namespace GCatcode.DataBase.Migrations
                         new
                         {
                             UserId = 1,
-                            RolId = 1
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             UserId = 1,
-                            RolId = 2
-                        },
-                        new
-                        {
-                            UserId = 1,
-                            RolId = 3
-                        },
-                        new
-                        {
-                            UserId = 1,
-                            RolId = 4
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             UserId = 2,
-                            RolId = 2
+                            RolId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             UserId = 3,
-                            RolId = 3
+                            RolId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             UserId = 4,
-                            RolId = 4
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -780,6 +800,21 @@ namespace GCatcode.DataBase.Migrations
                     b.Property<int>("RolId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
                     b.HasKey("ViewId", "RolId");
 
                     b.HasIndex("RolId");
@@ -790,52 +825,82 @@ namespace GCatcode.DataBase.Migrations
                         new
                         {
                             ViewId = 1,
-                            RolId = 1
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 3,
-                            RolId = 1
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 4,
-                            RolId = 1
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 5,
-                            RolId = 1
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 1,
-                            RolId = 4
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 3,
-                            RolId = 4
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 4,
-                            RolId = 4
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 5,
-                            RolId = 4
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 1,
-                            RolId = 3
+                            RolId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             ViewId = 1,
-                            RolId = 2
+                            RolId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -953,7 +1018,7 @@ namespace GCatcode.DataBase.Migrations
                             CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "dev@local.com",
                             LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Password = "B8u/V5sy0wC7ZQSCtBSQqnl82wdSzXwjeVFpjzkNI4QPB8t0RMkHMV71/qRkgKJ0",
+                            Password = "io1YjvMsA3LEQ+gR04dQzm+epMPymJk9DyVlE3RYPqEiiU3Y7e7T959OVaxfihst",
                             UserName = "Dev"
                         },
                         new
@@ -963,7 +1028,7 @@ namespace GCatcode.DataBase.Migrations
                             CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "guest@local.com",
                             LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Password = "X3ZupnMNsxBnNefH1y+u+GLpvG07hz3cRN7C/NlP7wJDL/QniwW+TkEnqPb2jwtJ",
+                            Password = "e1t+3NBY04evdGNyxnnxxqjUBubBnTNk70nbxfc/tkLL5I4DPuA64y2PqxeaCIGA",
                             UserName = "Guest"
                         },
                         new
@@ -973,7 +1038,7 @@ namespace GCatcode.DataBase.Migrations
                             CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "user@local.com",
                             LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Password = "NQ+/TPuJltbMz2S/Anq+K/OQq6NRUtJ1iTEYN+sDTqQ2GmGHaxnhxaGiOWY197Bc",
+                            Password = "A0kS7WbBH03fl86Y8Ko5DTuPLJRapViD3Yh4HoLwSgcoxIY/H9iNH3WPGlq30JCZ",
                             UserName = "User"
                         },
                         new
@@ -983,7 +1048,7 @@ namespace GCatcode.DataBase.Migrations
                             CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@local.com",
                             LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Password = "Ax6nHg2mDM1aYEdX0Sh8wTPw90jQuF2+iDqu2IjyvgbBTpGNzigf4WuO98nTgB6n",
+                            Password = "lFONJXpDxXzLRAje8S8hFGeDd5sp4C3UWfxtR1ZeXNcYVgLCA450RwfkXUN8JPV/",
                             UserName = "Admin"
                         });
                 });

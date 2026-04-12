@@ -1,7 +1,7 @@
 ﻿using GCatcode.Api.Configuration;
-using GCatcode.Repository.DB.PermissionServices;
-using GCatcode.Repository.DB.PermissionServices.Models;
-using GCatcode.Repository.DB.RolServices.Models;
+using GCatcode.Services.DB.PermissionServices;
+using GCatcode.Services.DB.PermissionServices.Models;
+using GCatcode.Services.DB.RolServices.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Security.Claims;
@@ -11,15 +11,14 @@ namespace GCatcode.Api.Core
     public class BaseController : ControllerBase
     {
         protected readonly AppSettings _configuration;
-
         public BaseController(AppSettings configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration;            
         }
 
         protected bool IsAdmin => GetRoles()?.Any(c => c == RolesType.Admin.ToString() || c == RolesType.Dev.ToString()) ?? false;
 
-        private string? UserName { get; set; }
+        private string UserName { get; set; }
 
         [NonAction]
         protected string GetUserName()
@@ -31,7 +30,7 @@ namespace GCatcode.Api.Core
             return UserName ?? string.Empty;
         }
 
-        private string? UserEmail { get; set; }
+        private string UserEmail { get; set; }
 
         [NonAction]
         protected string GetUserEmail()
@@ -56,7 +55,7 @@ namespace GCatcode.Api.Core
             return UserId.Value;
         }
 
-        private IEnumerable<string>? Roles;
+        private IEnumerable<string> Roles;
 
         [NonAction]
         protected IEnumerable<string> GetRoles()
@@ -71,7 +70,7 @@ namespace GCatcode.Api.Core
 
         // ===== MÉTODOS PARA PERMISOS (RBAC + ABAC) =====
 
-        private IEnumerable<UserPermissionResult>? _userPermissions;
+        private IEnumerable<UserPermissionResult> _userPermissions;
 
         /// <summary>
         /// Obtiene todos los permisos del usuario actual (RBAC + ABAC)

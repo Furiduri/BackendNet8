@@ -1,9 +1,9 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.UserRolServices;
-using GCatcode.Repository.DB.UserRolServices.Models;
-using GCatcode.Repository.DB.UserServices;
-using GCatcode.Repository.DB.UserServices.Models;
+using GCatcode.Services.DB.UserRolServices;
+using GCatcode.Services.DB.UserRolServices.Models;
+using GCatcode.Services.DB.UserServices;
+using GCatcode.Services.DB.UserServices.Models;
 using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 

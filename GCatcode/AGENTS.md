@@ -505,6 +505,7 @@ dotnet ef database update --project GCatcode.Api
 
 - Ramas: `main`, `develop`, `feature/{nombre}`, `bugfix/{nombre}`, `release/{version}`, `hotfix/{nombre}`
 - Commits: Mensajes claros y con listado de cambios relevantes
+- Mensajes de commit: Usar formato `[Tipo] Descripción breve` (ej: `[Feature] Agregar endpoint de permisos directos`)
 
 ---
 

@@ -1,4 +1,4 @@
-﻿namespace GCatcode.Repository.DB.UserServices
+﻿namespace GCatcode.Services.DB.UserServices
 {
     public class UserItem
     {

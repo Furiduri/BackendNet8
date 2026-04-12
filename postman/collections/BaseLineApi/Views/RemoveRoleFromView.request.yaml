@@ -1,0 +1,14 @@
+$kind: http-request
+name: RemoveRoleFromView
+url: "{{URLAPI}}/Views/roles"
+method: DELETE
+body:
+  type: json
+  content: "{\r
+
+    \    \"RoleId\": 2,\r
+
+    \    \"ViewId\": 5\r
+
+    }"
+order: 9000

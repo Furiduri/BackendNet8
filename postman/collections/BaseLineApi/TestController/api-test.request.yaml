@@ -1,0 +1,5 @@
+$kind: http-request
+name: api/test
+url: "{{URLAPI}}/test"
+method: GET
+order: 1000

@@ -1,7 +1,7 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.RolServices;
-using GCatcode.Repository.DB.RolServices.Models;
+using GCatcode.Services.DB.RolServices;
+using GCatcode.Services.DB.RolServices.Models;
 using Microsoft.Data.SqlClient;
 
 namespace GCatcode.Api.Controllers.Admin.Roles

@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GCatcode.DataBase.Configurations
 {
-    public class BuilderUserRoles : IEntityTypeConfiguration<RL_UserRol>
+    public class BuilderUserRoles : BuilderBase<RL_UserRol>, IEntityTypeConfiguration<RL_UserRol>
     {
         public void Configure(EntityTypeBuilder<RL_UserRol> builder)
         {
+            Base(builder);
             builder.ToTable("RL_UserRoles");
             builder
                 .HasKey(ur => new { ur.UserId, ur.RolId });
@@ -21,13 +22,11 @@ namespace GCatcode.DataBase.Configurations
                 .HasForeignKey(ur => ur.RolId);
 
             builder.HasData([
-                new RL_UserRol { UserId = 1, RolId = (int)RolesType.Dev },
-                new RL_UserRol { UserId = 1, RolId = (int)RolesType.Guest },
-                new RL_UserRol { UserId = 1, RolId = (int)RolesType.User },
-                new RL_UserRol { UserId = 1, RolId = (int)RolesType.Admin },
-                new RL_UserRol { UserId = 2, RolId = (int)RolesType.Guest },
-                new RL_UserRol { UserId = 3, RolId = (int)RolesType.User },
-                new RL_UserRol { UserId = 4, RolId = (int)RolesType.Admin }
+                new RL_UserRol { UserId = 1, RolId = (int)RolesType.Dev, CreateTime = seedDate, LastUpdated = seedDate, Available = true },
+                new RL_UserRol { UserId = 1, RolId = (int)RolesType.Admin, CreateTime = seedDate, LastUpdated = seedDate, Available = true },
+                new RL_UserRol { UserId = 2, RolId = (int)RolesType.Guest, CreateTime = seedDate, LastUpdated = seedDate, Available = true },
+                new RL_UserRol { UserId = 3, RolId = (int)RolesType.User, CreateTime = seedDate, LastUpdated = seedDate, Available = true },
+                new RL_UserRol { UserId = 4, RolId = (int)RolesType.Admin, CreateTime = seedDate, LastUpdated = seedDate, Available = true }
             ]);
         }
     }

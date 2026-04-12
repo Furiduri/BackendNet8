@@ -10,7 +10,7 @@ namespace GCatcode.Api.Controllers.Views
             {
                 Key = "ViewNotFound",
                 StatusCode = System.Net.HttpStatusCode.NotFound,
-                Message = "Vista no encontrada"
+                Message = "View not found"
             };
         }
 
@@ -20,7 +20,7 @@ namespace GCatcode.Api.Controllers.Views
             {
                 Key = "InvalidData",
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Message = "Datos inválidos"
+                Message = "Invalid data"
             };
         }
 
@@ -30,7 +30,7 @@ namespace GCatcode.Api.Controllers.Views
             {
                 Key = "ViewAlreadyExists",
                 StatusCode = System.Net.HttpStatusCode.Conflict,
-                Message = "Ya existe una vista con ese nombre o ruta"
+                Message = "A view with that name or route already exists"
             };
         }
 
@@ -41,7 +41,7 @@ namespace GCatcode.Api.Controllers.Views
                 Key = "ViewCreated",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.Created,
-                Message = "Vista creada exitosamente"
+                Message = "View created successfully"
             };
         }
 
@@ -52,7 +52,7 @@ namespace GCatcode.Api.Controllers.Views
                 Key = "ViewUpdated",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Vista actualizada exitosamente"
+                Message = "View updated successfully"
             };
         }
 
@@ -63,7 +63,7 @@ namespace GCatcode.Api.Controllers.Views
                 Key = "ViewDeleted",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Vista eliminada exitosamente"
+                Message = "View deleted successfully"
             };
         }
 
@@ -74,7 +74,7 @@ namespace GCatcode.Api.Controllers.Views
                 Key = "RoleAssigned",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Rol asignado a la vista exitosamente"
+                Message = "Role assigned to view successfully"
             };
         }
 
@@ -85,18 +85,17 @@ namespace GCatcode.Api.Controllers.Views
                 Key = "RoleRemoved",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Rol removido de la vista exitosamente"
+                Message = "Role removed from view successfully"
             };
         }
 
-        public static StatusResponse RolesAssigned()
+        public static StatusResponse RoleNotFound()
         {
             return new StatusResponse
             {
-                Key = "RolesAssigned",
-                isSuccess = true,
-                StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Roles asignados a la vista exitosamente"
+                Key = "RoleNotFound",
+                StatusCode = System.Net.HttpStatusCode.NotFound,
+                Message = "Role not found"
             };
         }
 
@@ -106,7 +105,7 @@ namespace GCatcode.Api.Controllers.Views
             {
                 Key = "Forbidden",
                 StatusCode = System.Net.HttpStatusCode.Forbidden,
-                Message = string.IsNullOrEmpty(message) ? "No tienes permisos para realizar esta acción" : message
+                Message = string.IsNullOrEmpty(message) ? "You don't have permissions to perform this action" : message
             };
         }
     }

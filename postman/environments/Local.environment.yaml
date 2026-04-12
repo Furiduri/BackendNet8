@@ -1,0 +1,21 @@
+name: Local
+values:
+  - key: URLAPI
+    value: https://localhost:7185/api
+    enabled: true
+  - key: Correo
+    value: ""
+    enabled: true
+  - key: Password
+    value: ""
+    enabled: true
+  - key: Password_Base64
+    value: ""
+    enabled: true
+  - key: Token
+    value: ""
+    enabled: true
+  - key: RefreshToken
+    value: ""
+    enabled: true
+color: null

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GCatcode.DataBase.Migrations
 {
     /// <inheritdoc />
-    public partial class BaseMigration : Migration
+    public partial class BaseLineMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -123,7 +123,10 @@ namespace GCatcode.DataBase.Migrations
                 columns: table => new
                 {
                     RolId = table.Column<int>(type: "int", nullable: false),
-                    ViewId = table.Column<int>(type: "int", nullable: false)
+                    ViewId = table.Column<int>(type: "int", nullable: false),
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -178,7 +181,10 @@ namespace GCatcode.DataBase.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    RolId = table.Column<int>(type: "int", nullable: false)
+                    RolId = table.Column<int>(type: "int", nullable: false),
+                    Available = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -271,10 +277,10 @@ namespace GCatcode.DataBase.Migrations
                 columns: new[] { "UserId", "Available", "CreateTime", "Email", "LastUpdated", "Password", "UserName" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "dev@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "B8u/V5sy0wC7ZQSCtBSQqnl82wdSzXwjeVFpjzkNI4QPB8t0RMkHMV71/qRkgKJ0", "Dev" },
-                    { 2, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "guest@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "X3ZupnMNsxBnNefH1y+u+GLpvG07hz3cRN7C/NlP7wJDL/QniwW+TkEnqPb2jwtJ", "Guest" },
-                    { 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "user@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "NQ+/TPuJltbMz2S/Anq+K/OQq6NRUtJ1iTEYN+sDTqQ2GmGHaxnhxaGiOWY197Bc", "User" },
-                    { 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Ax6nHg2mDM1aYEdX0Sh8wTPw90jQuF2+iDqu2IjyvgbBTpGNzigf4WuO98nTgB6n", "Admin" }
+                    { 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "dev@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "io1YjvMsA3LEQ+gR04dQzm+epMPymJk9DyVlE3RYPqEiiU3Y7e7T959OVaxfihst", "Dev" },
+                    { 2, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "guest@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "e1t+3NBY04evdGNyxnnxxqjUBubBnTNk70nbxfc/tkLL5I4DPuA64y2PqxeaCIGA", "Guest" },
+                    { 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "user@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "A0kS7WbBH03fl86Y8Ko5DTuPLJRapViD3Yh4HoLwSgcoxIY/H9iNH3WPGlq30JCZ", "User" },
+                    { 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@local.com", new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "lFONJXpDxXzLRAje8S8hFGeDd5sp4C3UWfxtR1ZeXNcYVgLCA450RwfkXUN8JPV/", "Admin" }
                 });
 
             migrationBuilder.InsertData(
@@ -311,33 +317,31 @@ namespace GCatcode.DataBase.Migrations
 
             migrationBuilder.InsertData(
                 table: "RL_UserRoles",
-                columns: new[] { "RolId", "UserId" },
+                columns: new[] { "RolId", "UserId", "Available", "CreateTime", "LastUpdated" },
                 values: new object[,]
                 {
-                    { 1, 1 },
-                    { 2, 1 },
-                    { 3, 1 },
-                    { 4, 1 },
-                    { 2, 2 },
-                    { 3, 3 },
-                    { 4, 4 }
+                    { 1, 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 2, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
                 table: "RL_ViewRoles",
-                columns: new[] { "RolId", "ViewId" },
+                columns: new[] { "RolId", "ViewId", "Available", "CreateTime", "LastUpdated" },
                 values: new object[,]
                 {
-                    { 1, 1 },
-                    { 2, 1 },
-                    { 3, 1 },
-                    { 4, 1 },
-                    { 1, 3 },
-                    { 4, 3 },
-                    { 1, 4 },
-                    { 4, 4 },
-                    { 1, 5 },
-                    { 4, 5 }
+                    { 1, 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 1, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 1, 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 3, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 1, 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 4, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 1, 5, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 5, true, new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -411,11 +415,29 @@ namespace GCatcode.DataBase.Migrations
                 table: "TR_Users",
                 column: "UserName",
                 unique: true);
+
+            migrationBuilder.Sql(@"CREATE OR ALTER PROCEDURE [dbo].[sp_CleanExpiredRefreshTokens]
+                AS
+                BEGIN
+                    SET NOCOUNT ON;
+    
+                    DECLARE @DeletedCount INT;
+    
+                    DELETE FROM [dbo].[TR_RefreshTokens]
+                    WHERE ExpiryDate < GETUTCDATE();
+    
+                    SET @DeletedCount = @@ROWCOUNT;
+    
+                    PRINT CONCAT('Tokens expirados eliminados: ', @DeletedCount);
+                END
+                GO");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DROP PROCEDURE IF EXISTS [dbo].[sp_CleanExpiredRefreshTokens]");
+
             migrationBuilder.DropTable(
                 name: "RL_RolePermissions");
 

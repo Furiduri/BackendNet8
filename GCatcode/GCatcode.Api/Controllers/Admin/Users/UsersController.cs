@@ -1,8 +1,9 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.UserRolServices.Models;
-using GCatcode.Repository.DB.UserServices;
-using GCatcode.Repository.DB.UserServices.Models;
+using GCatcode.Api.Core.Authorization;
+using GCatcode.Services.DB.UserRolServices.Models;
+using GCatcode.Services.DB.UserServices;
+using GCatcode.Services.DB.UserServices.Models;
 using GCatcode.Utils.GenericModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GCatcode.Api.Controllers.Admin.Users
 {
     [Authorize]
+    [RequirePermission("users.admin")]
     [ApiController, Route("api/admin/[controller]")]
     public class UsersController : BaseController
     {
@@ -21,7 +23,7 @@ namespace GCatcode.Api.Controllers.Admin.Users
             _methods = new UsersMethods(configuration);
         }
 
-        [HttpGet("Search")]
+        [HttpGet("Search")]        
         [ProducesResponseType<IEnumerable<UserItem>>(StatusCodes.Status200OK)]
         public ActionResult Search(string term, int page = 1)
         {

@@ -10,9 +10,7 @@ namespace GCatcode.DataBase.Configurations
         {
             Base(builder);
             builder.ToTable("CL_Roles");
-            
-            var seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            
+                        
             builder.HasData([
                 new CL_Rol
                 {

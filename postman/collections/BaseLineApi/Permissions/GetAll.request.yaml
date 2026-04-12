@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{URLAPI}}/Permissions/all?page=1"
+method: GET
+queryParams:
+  page: "1"
+order: 1000

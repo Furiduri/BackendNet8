@@ -1,12 +1,14 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.RolServices.Models;
+using GCatcode.Api.Core.Authorization;
+using GCatcode.Services.DB.RolServices.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Controllers.Admin.Roles
 {
     [Authorize]
+    [RequirePermission("roles.admin")]
     [ApiController, Route("api/admin/[controller]")]
     public class RolesController : BaseController
     {

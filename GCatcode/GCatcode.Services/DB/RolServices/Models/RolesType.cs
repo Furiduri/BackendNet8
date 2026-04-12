@@ -1,4 +1,4 @@
-﻿namespace GCatcode.Repository.DB.RolServices.Models
+﻿namespace GCatcode.Services.DB.RolServices.Models
 {
     public enum RolesType
     {

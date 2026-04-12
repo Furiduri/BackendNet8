@@ -1,4 +1,4 @@
-﻿using GCatcode.Repository.DB.RolServices.Models;
+﻿using GCatcode.Services.DB.RolServices.Models;
 
 namespace GCatcode.Api.Core.Auth.Models
 {

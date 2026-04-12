@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GCatcode.Api", "GCatcode.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GCatcode.Utils", "Utils\GCatcode.Utils.csproj", "{55E1A3AE-E972-4824-9C2E-A4B7228103BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GCatcode.Repository", "GCatcode.Services\GCatcode.Repository.csproj", "{B497CD2C-D88F-4235-A007-E496D4BC0E01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GCatcode.Services", "GCatcode.Services\GCatcode.Services.csproj", "{B497CD2C-D88F-4235-A007-E496D4BC0E01}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUnit", "TestUnit\TestUnit.csproj", "{664F2F07-7BC1-4ACA-94B3-84B3A43C69F5}"
 EndProject

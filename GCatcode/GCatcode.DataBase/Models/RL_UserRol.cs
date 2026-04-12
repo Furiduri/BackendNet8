@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GCatcode.DataBase.Models
 {
-    public class RL_UserRol
+    public class RL_UserRol : BaseModel
     {
         [Required]
         public int UserId { get; set; }

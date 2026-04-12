@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{URLAPI}}/Views/all?page=1&pageSize=100"
+method: GET
+queryParams:
+  page: "1"
+  pageSize: "100"
+order: 1000

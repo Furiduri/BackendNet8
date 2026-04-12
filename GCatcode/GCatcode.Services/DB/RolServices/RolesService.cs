@@ -1,10 +1,10 @@
 ﻿using Dapper;
-using GCatcode.Repository.DB.RolServices.Models;
+using GCatcode.Services.DB.RolServices.Models;
 using GCatcode.Utils;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace GCatcode.Repository.DB.RolServices
+namespace GCatcode.Services.DB.RolServices
 {
     public class RolesService : DBService
     {
@@ -20,7 +20,7 @@ namespace GCatcode.Repository.DB.RolServices
 
         public RolDTO? GetById(int id)
         {
-            return DbConnection.QueryFirst<RolDTO>($@"SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @id", new { id }, Transaction);
+            return DbConnection.QueryFirstOrDefault<RolDTO>($@"SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @id", new { id }, Transaction);
         }
 
         public IEnumerable<RolDTO> Get(int page = 1, RolFilter? filters = null, int maxItems = 100)
@@ -28,29 +28,31 @@ namespace GCatcode.Repository.DB.RolServices
             return DbConnection.Query<RolDTO>($@"SELECT *
                     FROM [dbo].[CL_Roles] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}
                     ORDER BY RolId
-                    OFFSET {((page - 1) * maxItems)} ROWS"
+                    OFFSET {((page - 1) * maxItems)} ROWS FETCH NEXT {maxItems} ROWS ONLY"
                     , filters, Transaction);
         }
 
-        public RolDTO Delete(int id)
+        public RolDTO? Delete(int rolId)
         {
-            return DbConnection.QueryFirst<RolDTO>(
+            return DbConnection.QueryFirstOrDefault<RolDTO>(
                    $@"UPDATE [dbo].[CL_Roles]
                         SET Available = 0,
                             LastUpdated = @dateTime
                         WHERE RolId = @RolId
-                        SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @id
+                        SELECT * FROM [dbo].[CL_Roles] WHERE RolId = @RolId
             ",
             new
             {
-                id,
+                rolId,
                 dateTime = DateTime.UtcNow
             }, Transaction);
         }
 
-        public RolDTO Update(RolUpdate data)
+        public RolDTO? Update(RolUpdate data)
         {
-            return DbConnection.QueryFirst<RolDTO>(
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+            return DbConnection.QueryFirstOrDefault<RolDTO>(
                 $@"UPDATE [dbo].[CL_Roles]
                         SET Name = @Name,
                             Description = @Description,
@@ -69,9 +71,11 @@ namespace GCatcode.Repository.DB.RolServices
                 }, Transaction);
         }
 
-        public RolDTO Add(RolInsert data)
+        public RolDTO? Add(RolInsert data)
         {
-            return DbConnection.QueryFirst<RolDTO>(
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+            return DbConnection.QueryFirstOrDefault<RolDTO>(
                 $@"
                         INSERT INTO [dbo].[CL_Roles] (Name, Description)
                         VALUES (@Name, @Description)

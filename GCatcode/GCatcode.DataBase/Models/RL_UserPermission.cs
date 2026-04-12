@@ -22,12 +22,12 @@ namespace GCatcode.DataBase.Models
         public bool IsGranted { get; set; } = true; // true = conceder, false = denegar
 
         [MaxLength(500)]
-        public string? Conditions { get; set; } // JSON con condiciones ABAC adicionales (ej: horarios, IPs)
+        public string Conditions { get; set; } // JSON con condiciones ABAC adicionales (ej: horarios, IPs)
 
         [ForeignKey(nameof(UserId))]
-        public virtual TR_User? User { get; set; }
+        public virtual TR_User User { get; set; }
 
         [ForeignKey(nameof(PermissionId))]
-        public virtual CL_Permission? Permission { get; set; }
+        public virtual CL_Permission Permission { get; set; }
     }
 }

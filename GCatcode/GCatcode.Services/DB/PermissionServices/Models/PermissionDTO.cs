@@ -1,4 +1,4 @@
-namespace GCatcode.Repository.DB.PermissionServices.Models
+namespace GCatcode.Services.DB.PermissionServices.Models
 {
     public class PermissionDTO
     {

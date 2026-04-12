@@ -1,7 +1,8 @@
 using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.PermissionServices;
-using GCatcode.Repository.DB.PermissionServices.Models;
+using GCatcode.Services.DB.PermissionServices;
+using GCatcode.Services.DB.PermissionServices.Models;
+using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 
 namespace GCatcode.Api.Controllers.Permissions
@@ -15,13 +16,13 @@ namespace GCatcode.Api.Controllers.Permissions
             _configuration = configuration;
         }
 
-        public ApiResponse<IEnumerable<PermissionDTO>> GetAll()
+        public ApiResponse<PagesList<PermissionDTO>> GetAll(int page, int pageSize)
         {
             using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 var permissionService = new PermissionService(connection);
-                var permissions = permissionService.GetAll();
-                return ApiResponse<IEnumerable<PermissionDTO>>.SuccessResult(permissions, "Permisos obtenidos exitosamente");
+                var permissions = permissionService.GetAll(page, pageSize);
+                return ApiResponse<PagesList<PermissionDTO>>.SuccessResult(permissions);
             }
         }
 
@@ -37,7 +38,7 @@ namespace GCatcode.Api.Controllers.Permissions
                     return ApiResponse<PermissionDTO>.ErrorResult(PermissionResponse.PermissionNotFound());
                 }
 
-                return ApiResponse<PermissionDTO>.SuccessResult(permission, "Permiso obtenido exitosamente");
+                return ApiResponse<PermissionDTO>.SuccessResult(permission);
             }
         }
 
@@ -47,7 +48,7 @@ namespace GCatcode.Api.Controllers.Permissions
             {
                 var permissionService = new PermissionService(connection);
                 var permissions = permissionService.GetUserPermissions(userId);
-                return ApiResponse<IEnumerable<UserPermissionResult>>.SuccessResult(permissions, "Permisos del usuario obtenidos exitosamente");
+                return ApiResponse<IEnumerable<UserPermissionResult>>.SuccessResult(permissions);
             }
         }
 
@@ -57,7 +58,7 @@ namespace GCatcode.Api.Controllers.Permissions
             {
                 var permissionService = new PermissionService(connection);
                 var permissions = permissionService.GetRolePermissions(roleId);
-                return ApiResponse<IEnumerable<PermissionDTO>>.SuccessResult(permissions, "Permisos del rol obtenidos exitosamente");
+                return ApiResponse<IEnumerable<PermissionDTO>>.SuccessResult(permissions);
             }
         }
 
@@ -79,7 +80,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 permissionService.GrantPermissionToUser(data.UserId, data.PermissionId, data.IsGranted, data.Conditions);
                 transaction.Commit();
 
-                return ApiResponse<StatusResponse>.SuccessResult(PermissionResponse.PermissionGranted(), PermissionResponse.PermissionGranted().Message);
+                return ApiResponse<StatusResponse>.Result(PermissionResponse.PermissionGranted());
             }
         }
 
@@ -94,7 +95,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 permissionService.RevokePermissionFromUser(userId, permissionId);
                 transaction.Commit();
 
-                return ApiResponse<StatusResponse>.SuccessResult(PermissionResponse.PermissionRevoked(), PermissionResponse.PermissionRevoked().Message);
+                return ApiResponse<StatusResponse>.Result(PermissionResponse.PermissionRevoked());
             }
         }
 
@@ -116,7 +117,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 permissionService.GrantPermissionToRole(data.RoleId, data.PermissionId);
                 transaction.Commit();
 
-                return ApiResponse<StatusResponse>.SuccessResult(PermissionResponse.PermissionAssignedToRole(), PermissionResponse.PermissionAssignedToRole().Message);
+                return ApiResponse<StatusResponse>.Result(PermissionResponse.PermissionAssignedToRole());
             }
         }
 
@@ -131,7 +132,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 permissionService.RevokePermissionFromRole(roleId, permissionId);
                 transaction.Commit();
 
-                return ApiResponse<StatusResponse>.SuccessResult(PermissionResponse.PermissionRemovedFromRole(), PermissionResponse.PermissionRemovedFromRole().Message);
+                return ApiResponse<StatusResponse>.Result(PermissionResponse.PermissionRemovedFromRole());
             }
         }
     }

@@ -1,0 +1,14 @@
+$kind: http-request
+name: AssignRoleToView
+url: "{{URLAPI}}/Views/roles"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"RoleId\": 201,\r
+
+    \    \"ViewId\": 5\r
+
+    }"
+order: 11000

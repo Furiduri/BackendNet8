@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{URLAPI}}/auth/revoke"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"RefreshToken\": \"{{RefreshToken}}\"\r
+
+    }"
+order: 5000

@@ -1,0 +1,14 @@
+$kind: http-request
+name: Delete and AssignRolesToView
+url: "{{URLAPI}}/Views/roles"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"RoleIds\": [1,2],\r
+
+    \    \"ViewId\": 5\r
+
+    }"
+order: 10091

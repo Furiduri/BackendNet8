@@ -1,0 +1,26 @@
+$kind: http-request
+name: Update
+url: "{{URLAPI}}/Views"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \  \"ViewId\": 2,\r
+
+    \  \"Name\": \"Admin\",\r
+
+    \  \"Route\": \"admin\",\r
+
+    \  \"Icon\": \"ad\",\r
+
+    \  \"Description\": \"View for Admin tools\",\r
+
+    \  \"ParentViewId\": null,\r
+
+    \  \"Order\": 0,\r
+
+    \  \"IsActive\": true\r
+
+    }"
+order: 7000

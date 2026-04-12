@@ -1,11 +1,10 @@
-﻿using GCatcode.Repository.DB.UserServices;
+﻿using GCatcode.Services.DB.UserServices;
 using GCatcode.Utils;
-using System.Buffers.Text;
 
 namespace TestUnit.Repository
 {
     [TestClass]
-    public class TestUsers : TestRepositoryConfig
+    public sealed class TestUsers : TestRepositoryConfig
     {
         public TestUsers() : base()
         {

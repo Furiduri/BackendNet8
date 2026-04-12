@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{URLAPI}}/Views"
+method: GET
+order: 3000

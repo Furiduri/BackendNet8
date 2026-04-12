@@ -21,7 +21,7 @@ var jwtSettings = builder.Configuration
 var appSettingsConfig = builder.Configuration
     .GetSection("AppSettings")
     .Get<AppSettings>() ?? new AppSettings();
-
+appSettingsConfig.Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 appSettingsConfig.DB = connectionStrings;
 appSettingsConfig.JwtSettings = jwtSettings;
 

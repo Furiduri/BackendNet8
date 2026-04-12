@@ -1,4 +1,4 @@
-namespace GCatcode.Repository.DB.ViewServices.Models
+namespace GCatcode.Services.DB.ViewServices.Models
 {
     public class ViewDTO
     {
@@ -59,4 +59,11 @@ namespace GCatcode.Repository.DB.ViewServices.Models
         public int ViewId { get; set; }
         public int RoleId { get; set; }
     }
+
+    public class ViewAssignmentRoleList
+    {
+        public int ViewId { get; set; }
+        public IEnumerable<int> RoleIds { get; set; }
+    }
+
 }

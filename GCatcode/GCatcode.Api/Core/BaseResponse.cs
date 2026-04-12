@@ -1,3 +1,4 @@
+using GCatcode.Api.Configuration;
 using System.Net;
 
 namespace GCatcode.Api.Core
@@ -19,7 +20,14 @@ namespace GCatcode.Api.Core
 
         public static StatusResponse InvalidCredentials() => new StatusResponse { Key = "InvalidCredentials", StatusCode = HttpStatusCode.Unauthorized, Message = "Invalid credentials provided." };
 
-        public static StatusResponse InternalServerError(string message = null) => new StatusResponse { Key = "InternalServerError", StatusCode = HttpStatusCode.InternalServerError, Message = string.IsNullOrEmpty(message) ? "Internal Server Error, contact support" : message };
+        public static StatusResponse InternalServerError(string message = null) => new StatusResponse 
+        { 
+            Key = "InternalServerError", 
+            StatusCode = HttpStatusCode.InternalServerError, 
+            Message = string.IsNullOrEmpty(message) 
+                ? "Internal Server Error, contact support" 
+                : (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? message : "Internal Server Error, contact support") // Oculta detalles en producción
+        };
     }
 
     public class StatusResponse

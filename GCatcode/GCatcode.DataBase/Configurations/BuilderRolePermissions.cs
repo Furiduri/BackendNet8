@@ -12,8 +12,6 @@ namespace GCatcode.DataBase.Configurations
             builder.ToTable("RL_RolePermissions");
             builder.HasIndex(rp => new { rp.RolId, rp.PermissionId }).IsUnique();
 
-            var seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
             // Asignación de permisos por rol
             builder.HasData([
                 // Dev (RolId = 1) - Todos los permisos

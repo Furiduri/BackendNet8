@@ -1,9 +1,9 @@
 using Dapper;
-using GCatcode.Repository.DB.RefreshTokenServices.Models;
+using GCatcode.Services.DB.RefreshTokenServices.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace GCatcode.Repository.DB.RefreshTokenServices
+namespace GCatcode.Services.DB.RefreshTokenServices
 {
     public class RefreshTokenService : DBService
     {

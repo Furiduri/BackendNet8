@@ -1,7 +1,9 @@
 using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
-using GCatcode.Repository.DB.ViewServices;
-using GCatcode.Repository.DB.ViewServices.Models;
+using GCatcode.Services.DB.RolServices;
+using GCatcode.Services.DB.ViewServices;
+using GCatcode.Services.DB.ViewServices.Models;
+using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 
 namespace GCatcode.Api.Controllers.Views
@@ -15,23 +17,13 @@ namespace GCatcode.Api.Controllers.Views
             _configuration = configuration;
         }
 
-        public ApiResponse<IEnumerable<ViewDTO>> GetAll()
+        public ApiResponse<PagesList<ViewDTO>> GetAll(int page, int pageSize)
         {
             using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 var viewService = new ViewService(connection);
-                var views = viewService.GetAll();
-                return ApiResponse<IEnumerable<ViewDTO>>.SuccessResult(views, "Vistas obtenidas exitosamente");
-            }
-        }
-
-        public ApiResponse<IEnumerable<ViewWithRoles>> GetAllWithRoles()
-        {
-            using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
-            {
-                var viewService = new ViewService(connection);
-                var views = viewService.GetAllWithRoles();
-                return ApiResponse<IEnumerable<ViewWithRoles>>.SuccessResult(views, "Vistas con roles obtenidas exitosamente");
+                var views = viewService.GetAll(page, pageSize);
+                return ApiResponse<PagesList<ViewDTO>>.SuccessResult(views);
             }
         }
 
@@ -47,7 +39,7 @@ namespace GCatcode.Api.Controllers.Views
                     return ApiResponse<ViewDTO>.ErrorResult(ViewResponse.ViewNotFound());
                 }
 
-                return ApiResponse<ViewDTO>.SuccessResult(view, "Vista obtenida exitosamente");
+                return ApiResponse<ViewDTO>.SuccessResult(view);
             }
         }
 
@@ -57,7 +49,7 @@ namespace GCatcode.Api.Controllers.Views
             {
                 var viewService = new ViewService(connection);
                 var views = viewService.GetByUserId(userId);
-                return ApiResponse<IEnumerable<ViewDTO>>.SuccessResult(views, "Vistas del usuario obtenidas exitosamente");
+                return ApiResponse<IEnumerable<ViewDTO>>.SuccessResult(views);
             }
         }
 
@@ -67,7 +59,7 @@ namespace GCatcode.Api.Controllers.Views
             {
                 var viewService = new ViewService(connection);
                 var views = viewService.GetByRoleId(roleId);
-                return ApiResponse<IEnumerable<ViewDTO>>.SuccessResult(views, "Vistas del rol obtenidas exitosamente");
+                return ApiResponse<IEnumerable<ViewDTO>>.SuccessResult(views);
             }
         }
 
@@ -78,7 +70,11 @@ namespace GCatcode.Api.Controllers.Views
                 connection.Open();
                 var transaction = connection.BeginTransaction();
                 var viewService = new ViewService(connection, transaction);
-
+                var existingView = viewService.GetByRoute(data.Route);
+                if (existingView != null)
+                {
+                    return ApiResponse<ViewDTO>.ErrorResult(ViewResponse.ViewAlreadyExists());
+                }
                 var createdView = viewService.Add(data);
 
                 if (createdView == null)
@@ -88,7 +84,7 @@ namespace GCatcode.Api.Controllers.Views
                 }
 
                 transaction.Commit();
-                return ApiResponse<ViewDTO>.SuccessResult(createdView, ViewResponse.ViewCreated().Message);
+                return ApiResponse<ViewDTO>.Result(ViewResponse.ViewCreated(), createdView);
             }
         }
 
@@ -117,7 +113,7 @@ namespace GCatcode.Api.Controllers.Views
 
                 transaction.Commit();
                 var updatedView = viewService.GetById(data.ViewId);
-                return ApiResponse<ViewDTO>.SuccessResult(updatedView!, ViewResponse.ViewUpdated().Message);
+                return ApiResponse<ViewDTO>.Result(ViewResponse.ViewUpdated(), updatedView!);
             }
         }
 
@@ -145,11 +141,41 @@ namespace GCatcode.Api.Controllers.Views
                 }
 
                 transaction.Commit();
-                return ApiResponse<ViewDTO>.SuccessResult(existingView, ViewResponse.ViewDeleted().Message);
+                return ApiResponse<ViewDTO>.Result(ViewResponse.ViewDeleted(), existingView);
             }
         }
 
-        public ApiResponse<StatusResponse> AssignRoleToView(int viewId, int roleId)
+        public ApiResponse<StatusResponse> AssignRoleToView(ViewRoleAssignment viewToRole)
+        {
+            using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
+            {
+                connection.Open();
+                var transaction = connection.BeginTransaction();
+                var viewService = new ViewService(connection, transaction);
+                var roleService = new RolesService(connection, transaction);
+
+                var existingView = viewService.GetById(viewToRole.ViewId);
+                if (existingView == null)
+                {
+                    transaction.Rollback();
+                    return ApiResponse<StatusResponse>.ErrorResult(ViewResponse.ViewNotFound());
+                }
+
+                var existingRoles = roleService.GetById(viewToRole.RoleId);
+                if (existingRoles == null)
+                {
+                    transaction.Rollback();
+                    return ApiResponse<StatusResponse>.ErrorResult(ViewResponse.RoleNotFound());
+                }
+
+                viewService.AssignViewToRole(viewToRole);
+                transaction.Commit();
+
+                return ApiResponse<StatusResponse>.Result(ViewResponse.RoleAssigned());
+            }
+        }
+
+        public ApiResponse<StatusResponse> RemoveRoleFromView(ViewRoleAssignment viewToRole)
         {
             using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
             {
@@ -157,61 +183,50 @@ namespace GCatcode.Api.Controllers.Views
                 var transaction = connection.BeginTransaction();
                 var viewService = new ViewService(connection, transaction);
 
-                var existingView = viewService.GetById(viewId);
+                var existingView = viewService.GetById(viewToRole.ViewId);
                 if (existingView == null)
                 {
                     transaction.Rollback();
                     return ApiResponse<StatusResponse>.ErrorResult(ViewResponse.ViewNotFound());
                 }
 
-                viewService.AssignViewToRole(viewId, roleId);
+                viewService.RemoveViewFromRole(viewToRole);
                 transaction.Commit();
 
-                return ApiResponse<StatusResponse>.SuccessResult(ViewResponse.RoleAssigned(), ViewResponse.RoleAssigned().Message);
+                return ApiResponse<StatusResponse>.Result(ViewResponse.RoleRemoved());
             }
         }
 
-        public ApiResponse<StatusResponse> RemoveRoleFromView(int viewId, int roleId)
+        public ApiResponse<StatusResponse> AssignRolesToView(ViewAssignmentRoleList assignmentRoleList)
         {
             using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
             {
                 connection.Open();
                 var transaction = connection.BeginTransaction();
                 var viewService = new ViewService(connection, transaction);
+                var roleService = new RolesService(connection, transaction);
 
-                var existingView = viewService.GetById(viewId);
+                var existingView = viewService.GetById(assignmentRoleList.ViewId);
                 if (existingView == null)
                 {
                     transaction.Rollback();
                     return ApiResponse<StatusResponse>.ErrorResult(ViewResponse.ViewNotFound());
                 }
 
-                viewService.RemoveViewFromRole(viewId, roleId);
-                transaction.Commit();
-
-                return ApiResponse<StatusResponse>.SuccessResult(ViewResponse.RoleRemoved(), ViewResponse.RoleRemoved().Message);
-            }
-        }
-
-        public ApiResponse<StatusResponse> AssignRolesToView(int viewId, IEnumerable<int> roleIds)
-        {
-            using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
-            {
-                connection.Open();
-                var transaction = connection.BeginTransaction();
-                var viewService = new ViewService(connection, transaction);
-
-                var existingView = viewService.GetById(viewId);
-                if (existingView == null)
+                foreach (var rol in assignmentRoleList.RoleIds)
                 {
-                    transaction.Rollback();
-                    return ApiResponse<StatusResponse>.ErrorResult(ViewResponse.ViewNotFound());
+                    var existingRol = roleService.GetById(rol);
+                    if (existingRol == null)
+                    {
+                        transaction.Rollback();
+                        return ApiResponse<StatusResponse>.ErrorResult(ViewResponse.RoleNotFound());
+                    }
                 }
 
-                viewService.AssignRolesToView(viewId, roleIds);
+                viewService.AssignRolesToView(assignmentRoleList);
                 transaction.Commit();
 
-                return ApiResponse<StatusResponse>.SuccessResult(ViewResponse.RolesAssigned(), ViewResponse.RolesAssigned().Message);
+                return ApiResponse<StatusResponse>.Result(ViewResponse.RoleAssigned());
             }
         }
     }

@@ -1,7 +1,7 @@
 using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
 using GCatcode.Api.Core.Authorization;
-using GCatcode.Repository.DB.PermissionServices.Models;
+using GCatcode.Services.DB.PermissionServices.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,13 +20,13 @@ namespace GCatcode.Api.Controllers.Permissions
         /// <summary>
         /// Obtiene todos los permisos disponibles en el sistema
         /// </summary>
-        [HttpGet, Authorize]
+        [HttpGet("all"), Authorize]
         [RequirePermission("permissions.read")]
-        public IActionResult GetAll()
+        public IActionResult GetAll(int page =  1, int pageSize = 10)
         {
             try
             {
-                var response = _methods.GetAll();
+                var response = _methods.GetAll(page, pageSize);
                 return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
@@ -60,7 +60,7 @@ namespace GCatcode.Api.Controllers.Permissions
         /// <summary>
         /// Obtiene todos los permisos del usuario actual (RBAC + ABAC)
         /// </summary>
-        [HttpGet("my-permissions"), Authorize]
+        [HttpGet(), Authorize]
         public IActionResult GetMyPermissions()
         {
             try

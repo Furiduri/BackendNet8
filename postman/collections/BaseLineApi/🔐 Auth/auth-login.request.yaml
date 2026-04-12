@@ -1,0 +1,66 @@
+$kind: http-request
+name: auth/login
+url: "{{URLAPI}}/auth/login"
+method: POST
+body:
+  type: json
+  content: " {\r
+
+    \    \"EMAIL\": \"{{Correo}}\",\r
+
+    \    \"PASSWORD\": \"{{Password_Base64}}\"\r
+
+    \ }"
+scripts:
+  - type: afterResponse
+    code: "var jsonData = pm.response.json();\r
+
+      pm.expect(jsonData).to.have.property('isSuccess').that.is.a('boolean');\r
+
+      pm.expect(jsonData).to.have.property('message').that.is.a('string');\r
+
+      pm.expect(jsonData).to.have.property('statusCode').that.is.a('number');\r
+
+      pm.expect(jsonData).to.have.property('data').that.is.an('object');\r
+
+      \r
+
+      if (jsonData.isSuccess) {\r
+
+      \    pm.environment.set(\"Token\", jsonData.data.token);\r
+
+      \    pm.environment.set(\"RefreshToken\", jsonData.data.refreshToken);\r
+
+      } else {\r
+
+      \    pm.environment.set(\"Token\", jsonData.isSuccess);\r
+
+      }"
+    language: text/javascript
+  - type: beforeRequest
+    code: >
+      // Base64-encode the environment variable `Password` into
+      `Password_Base64`
+
+      // Uses built-in btoa/encodeURIComponent to avoid requiring
+      CryptoJS/Crypto.
+
+
+      const plainText = pm.environment.get('Password');
+
+
+      if (plainText === undefined || plainText === null) {
+        throw new Error("Environment variable 'Password' is not set.");
+      }
+
+
+      // Ensure string + handle UTF-8 safely
+
+      const str = String(plainText);
+
+      const base64 = btoa(unescape(encodeURIComponent(str)));
+
+
+      pm.environment.set('Password_Base64', base64);
+    language: text/javascript
+order: 2000

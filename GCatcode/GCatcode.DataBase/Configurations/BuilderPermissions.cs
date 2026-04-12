@@ -13,8 +13,6 @@ namespace GCatcode.DataBase.Configurations
             builder.HasIndex(p => p.Code).IsUnique();
             builder.HasIndex(p => new { p.Resource, p.Action });
 
-            var seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
             // Seed de permisos base del sistema
             builder.HasData([
                 // Users

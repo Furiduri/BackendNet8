@@ -18,9 +18,9 @@ namespace GCatcode.DataBase.Models
         public int PermissionId { get; set; }
 
         [ForeignKey(nameof(RolId))]
-        public virtual CL_Rol? Role { get; set; }
+        public virtual CL_Rol Role { get; set; }
 
         [ForeignKey(nameof(PermissionId))]
-        public virtual CL_Permission? Permission { get; set; }
+        public virtual CL_Permission Permission { get; set; }
     }
 }

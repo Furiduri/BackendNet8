@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>annotations</Nullable>
-    <Version>0.1.2</Version>
+    <Nullable>enable</Nullable>
+    <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

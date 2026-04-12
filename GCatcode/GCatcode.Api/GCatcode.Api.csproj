@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-	  <Version>0.1.2</Version>
+	  <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GCatcode.DataBase\GCatcode.DataBase.csproj" />
-    <ProjectReference Include="..\GCatcode.Services\GCatcode.Repository.csproj" />
+    <ProjectReference Include="..\GCatcode.Services\GCatcode.Services.csproj" />
     <ProjectReference Include="..\Utils\GCatcode.Utils.csproj" />
   </ItemGroup>
 

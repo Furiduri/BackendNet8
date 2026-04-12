@@ -1,9 +1,10 @@
 using Dapper;
-using GCatcode.Repository.DB.PermissionServices.Models;
+using GCatcode.Services.DB.PermissionServices.Models;
+using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace GCatcode.Repository.DB.PermissionServices
+namespace GCatcode.Services.DB.PermissionServices
 {
     public class PermissionService : DBService
     {
@@ -15,15 +16,25 @@ namespace GCatcode.Repository.DB.PermissionServices
         /// <summary>
         /// Obtiene todos los permisos disponibles en el sistema
         /// </summary>
-        public IEnumerable<PermissionDTO> GetAll()
+        public PagesList<PermissionDTO> GetAll(int page, int pageSize)
         {
             const string sql = @"
                 SELECT PermissionId, Code, Resource, Action, Description
                 FROM CL_Permissions
                 WHERE Available = 1
-                ORDER BY Resource, Action";
+                ORDER BY Resource, Action
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
-            return DbConnection.Query<PermissionDTO>(sql, transaction: Transaction);
+            var items = DbConnection.Query<PermissionDTO>(sql, new { Offset = (page - 1) * pageSize, PageSize = pageSize }, transaction: Transaction);
+            const string countSql = "SELECT COUNT(*) FROM CL_Permissions WHERE Available = 1";
+            var totalCount = DbConnection.QueryFirstOrDefault<int>(countSql, transaction: Transaction);
+            return new PagesList<PermissionDTO>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         /// <summary>
@@ -58,39 +69,39 @@ namespace GCatcode.Repository.DB.PermissionServices
         /// </summary>
         public IEnumerable<UserPermissionResult> GetUserPermissions(int userId)
         {
-            const string sql = @"
-                -- Permisos heredados de roles (RBAC)
-                SELECT DISTINCT 
-                    p.PermissionId,
-                    p.Code,
-                    p.Resource,
-                    p.Action,
-                    'Role' as Source,
-                    CAST(1 AS BIT) as IsGranted
-                FROM CL_Permissions p
-                INNER JOIN RL_RolePermissions rp ON p.PermissionId = rp.PermissionId
-                INNER JOIN RL_UserRoles ur ON rp.RolId = ur.RolId
-                WHERE ur.UserId = @UserId 
-                    AND p.Available = 1 
-                    AND rp.Available = 1 
-                    AND ur.Available = 1
+            const string sql = @"WITH UserPermissions AS (
+                    SELECT DISTINCT
+                        p.PermissionId,
+                        p.Code,
+                        p.Resource,
+                        p.Action,
+                        'Role' as Source,
+                        CAST(1 AS BIT) as IsGranted
+                    FROM CL_Permissions p
+                    INNER JOIN RL_RolePermissions rp ON p.PermissionId = rp.PermissionId
+                    INNER JOIN RL_UserRoles ur ON rp.RolId = ur.RolId
+                    WHERE ur.UserId = @UserId
+                        AND p.Available = 1
+                        AND rp.Available = 1
 
-                UNION
+                    UNION
 
-                -- Permisos específicos del usuario (ABAC - Overrides)
-                SELECT 
-                    p.PermissionId,
-                    p.Code,
-                    p.Resource,
-                    p.Action,
-                    'User' as Source,
-                    up.IsGranted
-                FROM CL_Permissions p
-                INNER JOIN RL_UserPermissions up ON p.PermissionId = up.PermissionId
-                WHERE up.UserId = @UserId 
-                    AND p.Available = 1 
-                    AND up.Available = 1
-
+                    -- Permisos específicos del usuario (ABAC - Overrides)
+                    SELECT
+                        p.PermissionId,
+                        p.Code,
+                        p.Resource,
+                        p.Action,
+                        'User' as Source,
+                        up.IsGranted
+                    FROM CL_Permissions p
+                    INNER JOIN RL_UserPermissions up ON p.PermissionId = up.PermissionId
+                    WHERE up.UserId = @UserId
+                        AND p.Available = 1
+                        AND up.Available = 1
+                        )
+                SELECT *
+                FROM UserPermissions
                 ORDER BY Resource, Action";
 
             return DbConnection.Query<UserPermissionResult>(sql, new { UserId = userId }, transaction: Transaction);
@@ -107,14 +118,14 @@ namespace GCatcode.Repository.DB.PermissionServices
                 DECLARE @DirectPermissionGranted BIT = 0;
 
                 -- Verificar si existe permiso directo
-                SELECT TOP 1 
+                SELECT TOP 1
                     @HasDirectPermission = 1,
                     @DirectPermissionGranted = up.IsGranted
                 FROM RL_UserPermissions up
                 INNER JOIN CL_Permissions p ON up.PermissionId = p.PermissionId
-                WHERE up.UserId = @UserId 
+                WHERE up.UserId = @UserId
                     AND p.Code = @PermissionCode
-                    AND up.Available = 1 
+                    AND up.Available = 1
                     AND p.Available = 1;
 
                 -- Si tiene permiso directo, retornar ese valor
@@ -128,10 +139,10 @@ namespace GCatcode.Repository.DB.PermissionServices
                         FROM CL_Permissions p
                         INNER JOIN RL_RolePermissions rp ON p.PermissionId = rp.PermissionId
                         INNER JOIN RL_UserRoles ur ON rp.RolId = ur.RolId
-                        WHERE ur.UserId = @UserId 
+                        WHERE ur.UserId = @UserId
                             AND p.Code = @PermissionCode
-                            AND p.Available = 1 
-                            AND rp.Available = 1 
+                            AND p.Available = 1
+                            AND rp.Available = 1
                             AND ur.Available = 1
                     )
                         SELECT CAST(1 AS BIT) as HasPermission;
@@ -150,8 +161,8 @@ namespace GCatcode.Repository.DB.PermissionServices
             const string sql = @"
                 IF EXISTS (SELECT 1 FROM RL_UserPermissions WHERE UserId = @UserId AND PermissionId = @PermissionId AND Available = 1)
                 BEGIN
-                    UPDATE RL_UserPermissions 
-                    SET IsGranted = @IsGranted, 
+                    UPDATE RL_UserPermissions
+                    SET IsGranted = @IsGranted,
                         Conditions = @Conditions,
                         LastUpdated = GETUTCDATE()
                     WHERE UserId = @UserId AND PermissionId = @PermissionId;
@@ -171,8 +182,8 @@ namespace GCatcode.Repository.DB.PermissionServices
         public void RevokePermissionFromUser(int userId, int permissionId)
         {
             const string sql = @"
-                UPDATE RL_UserPermissions 
-                SET Available = 0, LastUpdated = GETUTCDATE()
+                UPDATE RL_UserPermissions
+                SET  IsGranted = 0, LastUpdated = GETUTCDATE()
                 WHERE UserId = @UserId AND PermissionId = @PermissionId";
 
             DbConnection.Execute(sql, new { UserId = userId, PermissionId = permissionId }, transaction: Transaction);
@@ -187,8 +198,8 @@ namespace GCatcode.Repository.DB.PermissionServices
                 SELECT p.PermissionId, p.Code, p.Resource, p.Action, p.Description
                 FROM CL_Permissions p
                 INNER JOIN RL_RolePermissions rp ON p.PermissionId = rp.PermissionId
-                WHERE rp.RolId = @RoleId 
-                    AND p.Available = 1 
+                WHERE rp.RolId = @RoleId
+                    AND p.Available = 1
                     AND rp.Available = 1
                 ORDER BY p.Resource, p.Action";
 
@@ -208,7 +219,7 @@ namespace GCatcode.Repository.DB.PermissionServices
                 END
                 ELSE
                 BEGIN
-                    UPDATE RL_RolePermissions 
+                    UPDATE RL_RolePermissions
                     SET Available = 1, LastUpdated = GETUTCDATE()
                     WHERE RolId = @RoleId AND PermissionId = @PermissionId;
                 END";
@@ -222,7 +233,7 @@ namespace GCatcode.Repository.DB.PermissionServices
         public void RevokePermissionFromRole(int roleId, int permissionId)
         {
             const string sql = @"
-                UPDATE RL_RolePermissions 
+                UPDATE RL_RolePermissions
                 SET Available = 0, LastUpdated = GETUTCDATE()
                 WHERE RolId = @RoleId AND PermissionId = @PermissionId";
 

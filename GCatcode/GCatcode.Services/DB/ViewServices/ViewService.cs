@@ -1,9 +1,10 @@
 using Dapper;
-using GCatcode.Repository.DB.ViewServices.Models;
+using GCatcode.Services.DB.ViewServices.Models;
+using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace GCatcode.Repository.DB.ViewServices
+namespace GCatcode.Services.DB.ViewServices
 {
     public class ViewService : DBService
     {
@@ -13,21 +14,31 @@ namespace GCatcode.Repository.DB.ViewServices
         }
 
         /// <summary>
-        /// Obtiene todas las vistas
+        /// Gets all views
         /// </summary>
-        public IEnumerable<ViewDTO> GetAll()
+        public PagesList<ViewDTO> GetAll(int page, int pageSize = 10)
         {
             const string sql = @"
                 SELECT ViewId, Name, Route, Icon, Description, ParentViewId, [Order], IsActive
                 FROM CL_Views
                 WHERE Available = 1
-                ORDER BY [Order], Name";
+                ORDER BY [Order], Name
+                OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
-            return DbConnection.Query<ViewDTO>(sql, transaction: Transaction);
+            var items = DbConnection.Query<ViewDTO>(sql, new { Offset = (page - 1) * pageSize, PageSize = pageSize }, transaction: Transaction);
+            var totalItems = DbConnection.QueryFirstOrDefault<int>("SELECT COUNT(*) FROM CL_Views WHERE Available = 1", transaction: Transaction);   
+            
+            return new PagesList<ViewDTO>
+            {
+                Items = items,
+                TotalCount = totalItems,
+                PageSize = pageSize,
+                Page = page
+            };
         }
 
         /// <summary>
-        /// Obtiene una vista por su ID
+        /// Gets a view by its ID
         /// </summary>
         public ViewDTO? GetById(int viewId)
         {
@@ -40,50 +51,7 @@ namespace GCatcode.Repository.DB.ViewServices
         }
 
         /// <summary>
-        /// Obtiene todas las vistas con sus roles asignados
-        /// </summary>
-        public IEnumerable<ViewWithRoles> GetAllWithRoles()
-        {
-            const string sql = @"
-                SELECT 
-                    v.ViewId, v.Name, v.Route, v.Icon, v.Description, 
-                    v.ParentViewId, v.[Order], v.IsActive,
-                    r.RolId, r.Name as RoleName
-                FROM CL_Views v
-                LEFT JOIN RL_ViewRoles vr ON v.ViewId = vr.ViewId
-                LEFT JOIN CL_Roles r ON vr.RolId = r.RolId AND r.Available = 1
-                WHERE v.Available = 1
-                ORDER BY v.[Order], v.Name";
-
-            var viewsDict = new Dictionary<int, ViewWithRoles>();
-
-            DbConnection.Query<ViewWithRoles, RoleInfo, ViewWithRoles>(
-                sql,
-                (view, role) =>
-                {
-                    if (!viewsDict.TryGetValue(view.ViewId, out var existingView))
-                    {
-                        existingView = view;
-                        existingView.Roles = new List<RoleInfo>();
-                        viewsDict.Add(view.ViewId, existingView);
-                    }
-
-                    if (role != null && role.RolId > 0)
-                    {
-                        existingView.Roles.Add(role);
-                    }
-
-                    return existingView;
-                },
-                splitOn: "RolId",
-                transaction: Transaction
-            );
-
-            return viewsDict.Values;
-        }
-
-        /// <summary>
-        /// Obtiene las vistas asignadas a un usuario (según sus roles)
+        /// Gets views assigned to a user (based on their roles)
         /// </summary>
         public IEnumerable<ViewDTO> GetByUserId(int userId)
         {
@@ -97,6 +65,7 @@ namespace GCatcode.Repository.DB.ViewServices
                 WHERE ur.UserId = @UserId 
                     AND v.Available = 1 
                     AND v.IsActive = 1
+                    AND vr.Available = 1
                     AND ur.Available = 1
                 ORDER BY v.[Order], v.Name";
 
@@ -104,7 +73,7 @@ namespace GCatcode.Repository.DB.ViewServices
         }
 
         /// <summary>
-        /// Obtiene las vistas asignadas a un rol
+        /// Gets views assigned to a role
         /// </summary>
         public IEnumerable<ViewDTO> GetByRoleId(int roleId)
         {
@@ -114,31 +83,34 @@ namespace GCatcode.Repository.DB.ViewServices
                 FROM CL_Views v
                 INNER JOIN RL_ViewRoles vr ON v.ViewId = vr.ViewId
                 WHERE vr.RolId = @RoleId 
-                    AND v.Available = 1
+                    AND v.Available = 1                    
+                    AND vr.Available = 1
                 ORDER BY v.[Order], v.Name";
 
             return DbConnection.Query<ViewDTO>(sql, new { RoleId = roleId }, transaction: Transaction);
         }
 
         /// <summary>
-        /// Crea una nueva vista
+        /// Creates a new view
         /// </summary>
         public ViewDTO? Add(ViewInsert data)
         {
+            if (data == null) throw new ArgumentNullException(nameof(data));
             const string sql = @"
                 INSERT INTO CL_Views (Name, Route, Icon, Description, ParentViewId, [Order], IsActive, CreateTime, LastUpdated, Available)
-                OUTPUT INSERTED.ViewId, INSERTED.Name, INSERTED.Route, INSERTED.Icon, INSERTED.Description, 
-                       INSERTED.ParentViewId, INSERTED.[Order], INSERTED.IsActive
-                VALUES (@Name, @Route, @Icon, @Description, @ParentViewId, @Order, @IsActive, GETUTCDATE(), GETUTCDATE(), 1)";
+                VALUES (@Name, @Route, @Icon, @Description, @ParentViewId, @Order, @IsActive, GETUTCDATE(), GETUTCDATE(), 1);
+                SELECT * FROM CL_Views WHERE ViewId = @@IDENTITY;";
 
             return DbConnection.QueryFirstOrDefault<ViewDTO>(sql, data, transaction: Transaction);
         }
 
         /// <summary>
-        /// Actualiza una vista existente
+        /// Updates an existing view
         /// </summary>
         public bool Update(ViewUpdate data)
         {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
             const string sql = @"
                 UPDATE CL_Views
                 SET Name = @Name,
@@ -156,7 +128,7 @@ namespace GCatcode.Repository.DB.ViewServices
         }
 
         /// <summary>
-        /// Elimina (soft delete) una vista
+        /// Deletes (soft delete) a view
         /// </summary>
         public bool Delete(int viewId)
         {
@@ -170,50 +142,65 @@ namespace GCatcode.Repository.DB.ViewServices
         }
 
         /// <summary>
-        /// Asigna una vista a un rol
+        /// Assigns a view to a role
         /// </summary>
-        public void AssignViewToRole(int viewId, int roleId)
+        public void AssignViewToRole(ViewRoleAssignment viewToRole)
         {
+            if (viewToRole == null) throw new ArgumentNullException(nameof(viewToRole));
+
             const string sql = @"
                 IF NOT EXISTS (SELECT 1 FROM RL_ViewRoles WHERE ViewId = @ViewId AND RolId = @RoleId)
                 BEGIN
-                    INSERT INTO RL_ViewRoles (ViewId, RolId)
-                    VALUES (@ViewId, @RoleId);
+                    INSERT INTO RL_ViewRoles (ViewId, RolId, CreateTime, LastUpdated, Available)
+                    VALUES (@ViewId, @RoleId, GETUTCDATE(), GETUTCDATE(), 1);
+                END ELSE BEGIN
+                    UPDATE RL_ViewRoles
+                    SET Available = 1,
+                        LastUpdated = GETUTCDATE()
+                    WHERE ViewId = @ViewId AND RolId = @RoleId;
                 END";
 
-            DbConnection.Execute(sql, new { ViewId = viewId, RoleId = roleId }, transaction: Transaction);
+            DbConnection.Execute(sql, viewToRole, transaction: Transaction);
         }
 
         /// <summary>
-        /// Remueve la asignación de una vista a un rol
+        /// Removes the assignment of a view from a role
         /// </summary>
-        public void RemoveViewFromRole(int viewId, int roleId)
+        public void RemoveViewFromRole(ViewRoleAssignment viewToRole)
         {
-            const string sql = @"
-                DELETE FROM RL_ViewRoles 
+            if (viewToRole == null) throw new ArgumentNullException(nameof(viewToRole));
+
+            const string sql = @"UPDATE RL_ViewRoles
+                SET Available = 0, LastUpdated = GETUTCDATE()   
                 WHERE ViewId = @ViewId AND RolId = @RoleId";
 
-            DbConnection.Execute(sql, new { ViewId = viewId, RoleId = roleId }, transaction: Transaction);
+            DbConnection.Execute(sql, viewToRole, transaction: Transaction);
         }
 
         /// <summary>
-        /// Asigna múltiples roles a una vista (reemplaza asignaciones existentes)
+        /// Assigns multiple roles to a view (replaces existing assignments)
         /// </summary>
-        public void AssignRolesToView(int viewId, IEnumerable<int> roleIds)
+        public void AssignRolesToView(ViewAssignmentRoleList assignmentRoleList)
         {
-            // Eliminar asignaciones existentes
-            const string deleteSql = "DELETE FROM RL_ViewRoles WHERE ViewId = @ViewId";
-            DbConnection.Execute(deleteSql, new { ViewId = viewId }, transaction: Transaction);
+            if (assignmentRoleList == null) throw new ArgumentNullException(nameof(assignmentRoleList));
 
-            // Insertar nuevas asignaciones
-            if (roleIds.Any())
-            {
-                const string insertSql = "INSERT INTO RL_ViewRoles (ViewId, RolId) VALUES (@ViewId, @RoleId)";
-                foreach (var roleId in roleIds)
+            // Remove existing assignments
+            const string deleteSql = "UPDATE RL_ViewRoles SET Available = 0, LastUpdated = GETUTCDATE() WHERE ViewId = @ViewId";
+            DbConnection.Execute(deleteSql, new { ViewId = assignmentRoleList.ViewId }, transaction: Transaction);
+            // Insert new assignments
+            if (assignmentRoleList.RoleIds.Any())
+            {                
+                foreach (var roleId in assignmentRoleList.RoleIds)
                 {
-                    DbConnection.Execute(insertSql, new { ViewId = viewId, RoleId = roleId }, transaction: Transaction);
+                    AssignViewToRole(new ViewRoleAssignment { ViewId = assignmentRoleList.ViewId, RoleId = roleId });
                 }
             }
+        }
+
+        public ViewDTO? GetByRoute(string route)
+        {
+            const string sql = "SELECT * FROM CL_Views WHERE Route LIKE @Route";
+            return DbConnection.QueryFirstOrDefault<ViewDTO>(sql, new { Route = route }, transaction: Transaction);
         }
     }
 }

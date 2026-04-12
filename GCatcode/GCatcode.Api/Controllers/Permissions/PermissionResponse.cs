@@ -10,7 +10,7 @@ namespace GCatcode.Api.Controllers.Permissions
             {
                 Key = "PermissionNotFound",
                 StatusCode = System.Net.HttpStatusCode.NotFound,
-                Message = "Permiso no encontrado"
+                Message = "Permission not found"
             };
         }
 
@@ -20,7 +20,7 @@ namespace GCatcode.Api.Controllers.Permissions
             {
                 Key = "InvalidData",
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Message = "Datos inválidos"
+                Message = "Invalid data"
             };
         }
 
@@ -31,7 +31,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 Key = "PermissionGranted",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Permiso otorgado exitosamente"
+                Message = "Permission granted successfully"
             };
         }
 
@@ -42,7 +42,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 Key = "PermissionRevoked",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Permiso revocado exitosamente"
+                Message = "Permission revoked successfully"
             };
         }
 
@@ -53,7 +53,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 Key = "PermissionAssignedToRole",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Permiso asignado al rol exitosamente"
+                Message = "Permission assigned to role successfully"
             };
         }
 
@@ -64,7 +64,7 @@ namespace GCatcode.Api.Controllers.Permissions
                 Key = "PermissionRemovedFromRole",
                 isSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Message = "Permiso removido del rol exitosamente"
+                Message = "Permission removed from role successfully"
             };
         }
     }

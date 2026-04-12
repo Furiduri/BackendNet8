@@ -1,15 +1,15 @@
 ﻿using Dapper;
-using GCatcode.Repository.DB.RolServices.Models;
-using GCatcode.Repository.DB.UserRolServices;
-using GCatcode.Repository.DB.UserRolServices.Models;
-using GCatcode.Repository.DB.UserServices.Models;
+using GCatcode.Services.DB.RolServices.Models;
+using GCatcode.Services.DB.UserRolServices;
+using GCatcode.Services.DB.UserRolServices.Models;
+using GCatcode.Services.DB.UserServices.Models;
 using GCatcode.Utils;
 using GCatcode.Utils.extensions;
 using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace GCatcode.Repository.DB.UserServices
+namespace GCatcode.Services.DB.UserServices
 {
     public class UserService : DBService
     {
@@ -123,7 +123,7 @@ namespace GCatcode.Repository.DB.UserServices
             string hashedPassword = Argon2Helper.HashPassword(user.Password);
 
             var res = DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"INSERT INTO [dbo].[TR_Users] (UserName, Email, Password) VALUES (@UserName, @Email, @Password)
+                @"INSERT INTO [dbo].[TR_Users] (UserName, Email, Password, Available, CreateTime, LastUpdated) VALUES (@UserName, @Email, @Password, 1, GETUTCDATE(), GETUTCDATE())
                 SELECT * FROM [dbo].[TR_Users] WHERE UserId = @@IDENTITY", new { user.UserName, Email = user.Email.ToLower(), Password = hashedPassword }, Transaction);
 
             if (res == null)

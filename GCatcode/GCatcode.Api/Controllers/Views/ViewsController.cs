@@ -1,7 +1,7 @@
 using GCatcode.Api.Configuration;
 using GCatcode.Api.Core;
 using GCatcode.Api.Core.Authorization;
-using GCatcode.Repository.DB.ViewServices.Models;
+using GCatcode.Services.DB.ViewServices.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,33 +20,13 @@ namespace GCatcode.Api.Controllers.Views
         /// <summary>
         /// Obtiene todas las vistas del sistema
         /// </summary>
-        [HttpGet, Authorize]
+        [HttpGet("all"), Authorize]
         [RequirePermission("views.read")]
-        public IActionResult GetAll()
+        public IActionResult GetAll(int page = 1, int pageSize = 10)
         {
             try
             {
-                var response = _methods.GetAll();
-                return StatusCode(response.StatusCode, response);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex);
-                var response = ViewResponse.InternalServerError(ex.Message);
-                return StatusCode((int)response.StatusCode, response);
-            }
-        }
-
-        /// <summary>
-        /// Obtiene todas las vistas con sus roles asignados
-        /// </summary>
-        [HttpGet("with-roles"), Authorize]
-        [RequirePermission("views.read")]
-        public IActionResult GetAllWithRoles()
-        {
-            try
-            {
-                var response = _methods.GetAllWithRoles();
+                var response = _methods.GetAll(page, pageSize);
                 return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
@@ -80,7 +60,7 @@ namespace GCatcode.Api.Controllers.Views
         /// <summary>
         /// Obtiene las vistas asignadas al usuario actual
         /// </summary>
-        [HttpGet("my-views"), Authorize]
+        [HttpGet, Authorize]
         public IActionResult GetMyViews()
         {
             try
@@ -205,13 +185,13 @@ namespace GCatcode.Api.Controllers.Views
         /// <summary>
         /// Asigna un rol a una vista
         /// </summary>
-        [HttpPost("{viewId}/roles/{roleId}"), Authorize]
+        [HttpPost("roles"), Authorize]
         [RequirePermission("views.write")]
-        public IActionResult AssignRoleToView(int viewId, int roleId)
+        public IActionResult AssignRoleToView([FromBody] ViewRoleAssignment viewToRole)
         {
             try
             {
-                var response = _methods.AssignRoleToView(viewId, roleId);
+                var response = _methods.AssignRoleToView(viewToRole);
                 return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
@@ -225,13 +205,13 @@ namespace GCatcode.Api.Controllers.Views
         /// <summary>
         /// Remueve un rol de una vista
         /// </summary>
-        [HttpDelete("{viewId}/roles/{roleId}"), Authorize]
+        [HttpDelete("roles"), Authorize]
         [RequirePermission("views.write")]
-        public IActionResult RemoveRoleFromView(int viewId, int roleId)
+        public IActionResult RemoveRoleFromView([FromBody] ViewRoleAssignment viewToRole)
         {
             try
             {
-                var response = _methods.RemoveRoleFromView(viewId, roleId);
+                var response = _methods.RemoveRoleFromView(viewToRole);
                 return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)
@@ -245,16 +225,16 @@ namespace GCatcode.Api.Controllers.Views
         /// <summary>
         /// Asigna múltiples roles a una vista (reemplaza asignaciones existentes)
         /// </summary>
-        [HttpPut("{viewId}/roles"), Authorize]
+        [HttpPut("roles"), Authorize]
         [RequirePermission("views.write")]
-        public IActionResult AssignRolesToView(int viewId, [FromBody] IEnumerable<int> roleIds)
+        public IActionResult AssignRolesToView([FromBody] ViewAssignmentRoleList assignmentRoleList)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ViewResponse.InvalidData());
 
-                var response = _methods.AssignRolesToView(viewId, roleIds);
+                var response = _methods.AssignRolesToView(assignmentRoleList);
                 return StatusCode(response.StatusCode, response);
             }
             catch (Exception ex)

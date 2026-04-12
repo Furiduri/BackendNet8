@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{URLAPI}}/Permissions/User/2"
+method: GET
+order: 4000
