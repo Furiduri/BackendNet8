@@ -9,7 +9,7 @@ BEGIN
     
     DECLARE @DeletedCount INT;
     
-    DELETE FROM [dbo].[RefreshTokens]
+    DELETE FROM [dbo].[TR_RefreshTokens]
     WHERE ExpiryDate < GETUTCDATE();
     
     SET @DeletedCount = @@ROWCOUNT;

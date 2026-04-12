@@ -1,0 +1,5 @@
+$kind: http-request
+name: Delete
+url: "{{URLAPI}}/Views/1001"
+method: DELETE
+order: 8000

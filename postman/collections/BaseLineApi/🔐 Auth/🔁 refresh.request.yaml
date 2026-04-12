@@ -1,0 +1,39 @@
+$kind: http-request
+url: "{{URLAPI}}/Auth/refresh"
+method: POST
+headers:
+  accept: text/plain
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "refreshToken": "{{RefreshToken}}"
+    }
+scripts:
+  - type: afterResponse
+    code: "var jsonData = pm.response.json();\r
+
+      pm.expect(jsonData).to.have.property('isSuccess').that.is.a('boolean');\r
+
+      pm.expect(jsonData).to.have.property('message').that.is.a('string');\r
+
+      pm.expect(jsonData).to.have.property('statusCode').that.is.a('number');\r
+
+      pm.expect(jsonData).to.have.property('data').that.is.an('object');\r
+
+      \r
+
+      if (jsonData.isSuccess) {\r
+
+      \    pm.environment.set(\"Token\", jsonData.data.token);\r
+
+      \    pm.environment.set(\"RefreshToken\", jsonData.data.refreshToken);\r
+
+      } else {\r
+
+      \    pm.environment.set(\"Token\", jsonData.isSuccess);\r
+
+      }"
+    language: text/javascript
+order: 4000

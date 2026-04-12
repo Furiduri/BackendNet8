@@ -1,0 +1,16 @@
+# Use this workspace to collaborate
+workspace:
+  id: f3622654-2f7d-4f79-8920-f626056015e1
+
+localResources:
+  specs:
+    - ..\GCatcode\GCatcode.Api\obj\Debug\net8.0\EndpointInfo\GCatcode.Api.json
+    - ..\GCatcode\GCatcode.Api\obj\Release\net8.0\EndpointInfo\GCatcode.Api.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ..\postman\collections\BaseLineApi: 5658237-e781db76-235f-4a44-bacd-7739ce1da086
+  environments:
+    ..\postman\environments\Local.environment.yaml: 5658237-4b4d3789-4973-4ff4-a2fd-ea0acab72ae5

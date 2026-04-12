@@ -4,15 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GCatcode.DataBase.Configurations
 {
-    public class BuilderRefreshTokens : BuilderBase<RefreshToken>, IEntityTypeConfiguration<RefreshToken>
+    public class BuilderRefreshTokens : IEntityTypeConfiguration<TR_RefreshToken>
     {
-        public void Configure(EntityTypeBuilder<RefreshToken> builder)
-        {
-            // Configuración base heredada (Available, CreateTime, LastUpdated)
-            Base(builder);
+        public void Configure(EntityTypeBuilder<TR_RefreshToken> builder)
+        {            
 
             // Configuración de la tabla
-            builder.ToTable("RefreshTokens");
+            builder.ToTable("TR_RefreshTokens");
 
             // Configuración de la clave primaria
             builder.HasKey(rt => rt.RefreshTokenId);

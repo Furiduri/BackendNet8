@@ -1,9 +1,9 @@
 using Dapper;
-using GCatcode.Repository.DB.RefreshTokenServices.Models;
+using GCatcode.Services.DB.RefreshTokenServices.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace GCatcode.Repository.DB.RefreshTokenServices
+namespace GCatcode.Services.DB.RefreshTokenServices
 {
     public class RefreshTokenService : DBService
     {
@@ -20,12 +20,12 @@ namespace GCatcode.Repository.DB.RefreshTokenServices
         public RefreshTokenDTO Add(RefreshTokenInsert data)
         {
             var query = @"
-                INSERT INTO [dbo].[RefreshTokens] 
+                INSERT INTO [dbo].[TR_RefreshTokens] 
                 (UserId, Token, ExpiryDate, IsRevoked, CreatedAt, CreatedByIp)
                 VALUES 
                 (@UserId, @Token, @ExpiryDate, 0, @CreatedAt, @CreatedByIp);
                 
-                SELECT * FROM [dbo].[RefreshTokens] 
+                SELECT * FROM [dbo].[TR_RefreshTokens] 
                 WHERE RefreshTokenId = SCOPE_IDENTITY();";
 
             return DbConnection.QueryFirstOrDefault<RefreshTokenDTO>(
@@ -44,7 +44,7 @@ namespace GCatcode.Repository.DB.RefreshTokenServices
         public RefreshTokenDTO GetByToken(string token)
         {
             var query = @"
-                SELECT * FROM [dbo].[RefreshTokens] 
+                SELECT * FROM [dbo].[TR_RefreshTokens] 
                 WHERE Token = @Token";
 
             return DbConnection.QueryFirstOrDefault<RefreshTokenDTO>(query, new { Token = token }, Transaction);
@@ -53,7 +53,7 @@ namespace GCatcode.Repository.DB.RefreshTokenServices
         public IEnumerable<RefreshTokenDTO> GetActiveTokensByUserId(int userId)
         {
             var query = @"
-                SELECT * FROM [dbo].[RefreshTokens] 
+                SELECT * FROM [dbo].[TR_RefreshTokens] 
                 WHERE UserId = @UserId 
                 AND IsRevoked = 0 
                 AND ExpiryDate > @Now
@@ -68,7 +68,7 @@ namespace GCatcode.Repository.DB.RefreshTokenServices
         public bool RevokeToken(string token, string revokedByIp)
         {
             var query = @"
-                UPDATE [dbo].[RefreshTokens]
+                UPDATE [dbo].[TR_RefreshTokens]
                 SET IsRevoked = 1,
                     RevokedAt = @RevokedAt,
                     RevokedByIp = @RevokedByIp
@@ -90,7 +90,7 @@ namespace GCatcode.Repository.DB.RefreshTokenServices
         public bool RevokeAllUserTokens(int userId, string revokedByIp)
         {
             var query = @"
-                UPDATE [dbo].[RefreshTokens]
+                UPDATE [dbo].[TR_RefreshTokens]
                 SET IsRevoked = 1,
                     RevokedAt = @RevokedAt,
                     RevokedByIp = @RevokedByIp
@@ -113,7 +113,7 @@ namespace GCatcode.Repository.DB.RefreshTokenServices
         public bool RevokeTokenAndReplace(string oldToken, string newToken, string revokedByIp)
         {
             var query = @"
-                UPDATE [dbo].[RefreshTokens]
+                UPDATE [dbo].[TR_RefreshTokens]
                 SET IsRevoked = 1,
                     RevokedAt = @RevokedAt,
                     RevokedByIp = @RevokedByIp,
@@ -137,7 +137,7 @@ namespace GCatcode.Repository.DB.RefreshTokenServices
         public void RemoveExpiredTokens()
         {
             var query = @"
-                DELETE FROM [dbo].[RefreshTokens]
+                DELETE FROM [dbo].[TR_RefreshTokens]
                 WHERE ExpiryDate < @Now";
 
             DbConnection.Execute(query, new { Now = DateTime.UtcNow }, Transaction);

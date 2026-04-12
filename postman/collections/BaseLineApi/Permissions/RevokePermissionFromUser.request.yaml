@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{URLAPI}}/Permissions/user/2/100"
+method: DELETE
+body:
+  type: text
+  content: "{\r
+
+    \  \"UserId\": 1,\r
+
+    \  \"PermissionId\": 2,\r
+
+    \  \"IsGranted\": true,\r
+
+    \  \"Conditions\": \"Cambio de puesto\"\r
+
+    }"
+order: 7000

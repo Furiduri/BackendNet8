@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{URLAPI}}/admin/roles/1"
+method: GET
+order: 1000

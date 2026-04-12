@@ -1,4 +1,4 @@
-namespace GCatcode.Repository.DB.RefreshTokenServices.Models
+namespace GCatcode.Services.DB.RefreshTokenServices.Models
 {
     public class RefreshTokenDTO
     {

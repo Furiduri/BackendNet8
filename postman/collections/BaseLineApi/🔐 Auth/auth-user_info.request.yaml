@@ -1,0 +1,5 @@
+$kind: http-request
+name: auth/user_info
+url: "{{URLAPI}}/auth/user_info"
+method: GET
+order: 3000

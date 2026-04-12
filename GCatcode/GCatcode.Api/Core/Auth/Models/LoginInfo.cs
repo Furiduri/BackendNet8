@@ -1,4 +1,4 @@
-﻿using GCatcode.Repository.DB.UserServices;
+﻿using GCatcode.Services.DB.UserServices;
 
 namespace GCatcode.Api.Core.Auth.Models
 {

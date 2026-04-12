@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GCatcode.Repository.DB.RolServices.Models
+namespace GCatcode.Services.DB.RolServices.Models
 {
     public class RolInsert
     {

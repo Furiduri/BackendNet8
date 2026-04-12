@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GCatcode.Services\GCatcode.Repository.csproj" />
+    <ProjectReference Include="..\GCatcode.Services\GCatcode.Services.csproj" />
     <ProjectReference Include="..\Utils\GCatcode.Utils.csproj" />
   </ItemGroup>
 

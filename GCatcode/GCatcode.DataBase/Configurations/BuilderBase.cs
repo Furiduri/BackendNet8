@@ -5,6 +5,9 @@ namespace GCatcode.DataBase.Configurations
 {
     public class BuilderBase<T> where T : BaseModel
     {
+
+        // Fecha fija para el seed inicial
+        protected DateTime seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         public void Base(EntityTypeBuilder<T> builder)
         {
             builder.Property(p => p.CreateTime)

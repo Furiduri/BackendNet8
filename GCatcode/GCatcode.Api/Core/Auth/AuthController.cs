@@ -1,13 +1,13 @@
 ﻿using GCatcode.Api.Configuration;
 using GCatcode.Api.Core.Auth.Models;
-using GCatcode.Repository.DB.UserServices;
+using GCatcode.Services.DB.UserServices;
+using GCatcode.Utils.GenericModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GCatcode.Api.Core.Auth
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]")]
     public class AuthController : BaseController
     {
         private readonly AuthMethods _methods;
@@ -20,7 +20,7 @@ namespace GCatcode.Api.Core.Auth
 
         [Authorize]
         [HttpGet("user_info")]
-        [ProducesResponseType<UserInfo>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ApiResponse<UserInfo>>(StatusCodes.Status200OK)]
         public ActionResult GetUserInfo()
         {
             try
@@ -42,7 +42,7 @@ namespace GCatcode.Api.Core.Auth
         /// <param name="user">user and Password in string Base64</param>
         /// <returns>JWT token</returns>
         [HttpPost("login")]
-        [ProducesResponseType<LoginInfo>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ApiResponse<LoginInfo>>(StatusCodes.Status200OK)]
         public ActionResult Login([FromBody] UserLogin user)
         {
             try
@@ -65,7 +65,7 @@ namespace GCatcode.Api.Core.Auth
         /// <param name="user"> UserName, email and Password in string Base64</param>
         /// <returns>JWT token</returns>
         [HttpPost("register")]
-        [ProducesResponseType<LoginInfo>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ApiResponse<LoginInfo>>(StatusCodes.Status200OK)]
         public IActionResult Register([FromBody] UserInsert user)
         {
             try
@@ -88,7 +88,7 @@ namespace GCatcode.Api.Core.Auth
         /// <param name="request">Refresh token</param>
         /// <returns>New JWT token and refresh token</returns>
         [HttpPost("refresh")]
-        [ProducesResponseType<LoginInfo>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ApiResponse<LoginInfo>>(StatusCodes.Status200OK)]
         public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
         {
             try
@@ -111,7 +111,7 @@ namespace GCatcode.Api.Core.Auth
         /// <param name="request">Refresh token to revoke</param>
         /// <returns>Success message</returns>
         [HttpPost("revoke")]
-        [ProducesResponseType<bool>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ApiResponse<GenericMessage>>(StatusCodes.Status200OK)]
         public IActionResult RevokeToken([FromBody] RefreshTokenRequest request)
         {
             try

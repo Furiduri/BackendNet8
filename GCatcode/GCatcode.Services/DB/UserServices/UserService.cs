@@ -1,15 +1,15 @@
 ﻿using Dapper;
-using GCatcode.Repository.DB.RolServices.Models;
-using GCatcode.Repository.DB.UserRolServices;
-using GCatcode.Repository.DB.UserRolServices.Models;
-using GCatcode.Repository.DB.UserServices.Models;
+using GCatcode.Services.DB.RolServices.Models;
+using GCatcode.Services.DB.UserRolServices;
+using GCatcode.Services.DB.UserRolServices.Models;
+using GCatcode.Services.DB.UserServices.Models;
 using GCatcode.Utils;
 using GCatcode.Utils.extensions;
 using GCatcode.Utils.GenericModels;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace GCatcode.Repository.DB.UserServices
+namespace GCatcode.Services.DB.UserServices
 {
     public class UserService : DBService
     {
@@ -25,8 +25,8 @@ namespace GCatcode.Repository.DB.UserServices
 
         public GenericMessage ChangePassword(UserChangePassword data)
         {
-            data.OldPassword = DecryptToBase64(data.OldPassword);
-            data.NewPassword = DecryptToBase64(data.NewPassword);
+            data.OldPassword = Argon2Helper.DecryptToBase64(data.OldPassword);
+            data.NewPassword = Argon2Helper.DecryptToBase64(data.NewPassword);
 
             var user = GetUpdateById(data.UserId);
             if (user == null)
@@ -52,7 +52,7 @@ namespace GCatcode.Repository.DB.UserServices
             string hashedNewPassword = Argon2Helper.HashPassword(data.NewPassword);
 
             DbConnection.Execute(
-                @"UPDATE [dbo].[Users]
+                @"UPDATE [dbo].[TR_Users]
                         SET Password = @Password,
                             LastUpdated = @dateTime
                         WHERE UserId = @UserId
@@ -70,18 +70,18 @@ namespace GCatcode.Repository.DB.UserServices
         public bool CheckUserName(string userName, int? userId = null)
         {
             UserDTO? user = DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserName = @userName AND UserId != @userId", new { userName, userId }, Transaction);
+                @"SELECT * FROM [dbo].[TR_Users] WHERE UserName = @userName AND UserId != @userId", new { userName, userId }, Transaction);
             return user != null;
         }
 
         public UserDTO Delete(int id)
         {
             return DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"UPDATE [dbo].[Users]
+                @"UPDATE [dbo].[TR_Users]
                     SET Available = 0,
                         LastUpdated = @dateTime
                     WHERE UserId = @UserId
-                    SELECT * FROM [dbo].[Users] WHERE UserId = @UserId
+                    SELECT * FROM [dbo].[TR_Users] WHERE UserId = @UserId
                 ",
                 new
                 {
@@ -93,7 +93,7 @@ namespace GCatcode.Repository.DB.UserServices
         public IEnumerable<UserDTO> Get(int maxItems = 100, int page = 1, UserFilter filters = null)
         {
             return DbConnection.Query<UserDTO>(
-                $@"SELECT * FROM [dbo].[Users] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}
+                $@"SELECT * FROM [dbo].[TR_Users] WHERE 1 = 1 {SQLUtils.ParseWere(filters)}
                     Order By UserId OFFSET {(page - 1) * maxItems} ROWS FETCH NEXT {maxItems} ROWS ONLY",
                 filters, Transaction);
         }
@@ -101,30 +101,30 @@ namespace GCatcode.Repository.DB.UserServices
         public UserDTO GetById(int id)
         {
             return DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserId = @id", new { id }, Transaction);
+                @"SELECT * FROM [dbo].[TR_Users] WHERE UserId = @id", new { id }, Transaction);
         }
 
         public UserUpdate GetUpdateById(int id)
         {
             return DbConnection.QueryFirstOrDefault<UserUpdate>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserId = @id", new { id }, Transaction);
+                @"SELECT * FROM [dbo].[TR_Users] WHERE UserId = @id", new { id }, Transaction);
         }
 
         public UserDTO GetByUserName(string userName)
         {
             return DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"SELECT * FROM [dbo].[Users] WHERE UserName = @userName AND Available = 1", new { userName }, Transaction);
+                @"SELECT * FROM [dbo].[TR_Users] WHERE UserName = @userName AND Available = 1", new { userName }, Transaction);
         }
 
         public UserDTO Add(UserInsert user)
         {
-            user.Password = DecryptToBase64(user.Password);
+            user.Password = Argon2Helper.DecryptToBase64(user.Password);
             ValidUser(user);
             string hashedPassword = Argon2Helper.HashPassword(user.Password);
 
             var res = DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"INSERT INTO [dbo].[Users] (UserName, Email, Password) VALUES (@UserName, @Email, @Password)
-                SELECT * FROM [dbo].[Users] WHERE UserId = @@IDENTITY", new { user.UserName, Email = user.Email.ToLower(), Password = hashedPassword }, Transaction);
+                @"INSERT INTO [dbo].[TR_Users] (UserName, Email, Password, Available, CreateTime, LastUpdated) VALUES (@UserName, @Email, @Password, 1, GETUTCDATE(), GETUTCDATE())
+                SELECT * FROM [dbo].[TR_Users] WHERE UserId = @@IDENTITY", new { user.UserName, Email = user.Email.ToLower(), Password = hashedPassword }, Transaction);
 
             if (res == null)
             {
@@ -150,13 +150,13 @@ namespace GCatcode.Repository.DB.UserServices
             ValidUser(data);
 
             return DbConnection.QueryFirstOrDefault<UserDTO>(
-                $@"UPDATE [dbo].[Users]
+                $@"UPDATE [dbo].[TR_Users]
                         SET UserName = @UserName,
                             Email = @Email,
                             Available = @Available,
                             LastUpdated = @dateTime
                         WHERE UserId = @UserId
-                        SELECT * FROM [dbo].[Users] WHERE UserId = @UserId
+                        SELECT * FROM [dbo].[TR_Users] WHERE UserId = @UserId
                         ",
                 new
                 {
@@ -170,7 +170,7 @@ namespace GCatcode.Repository.DB.UserServices
 
         public bool ValidPassword(UserLogin userLogin)
         {
-            userLogin.Password = DecryptToBase64(userLogin.Password);
+            userLogin.Password = Argon2Helper.DecryptToBase64(userLogin.Password);
             var userInDB = GetByEmail(userLogin.Email);
             if (userInDB == null)
             {
@@ -179,20 +179,6 @@ namespace GCatcode.Repository.DB.UserServices
             var user = GetUpdateById(userInDB.UserId);
 
             return Argon2Helper.VerifyPassword(userLogin.Password, user.Password);
-        }
-
-        private string DecryptToBase64(string password)
-        {
-            //En caso de que el password no este en base 64, se retorna tal cual
-            try
-            {
-                byte[] data = Convert.FromBase64String(password);
-                return System.Text.Encoding.UTF8.GetString(data);
-            }
-            catch
-            {
-                return password;
-            }
         }
 
         private void ValidUser(UserInsert user)
@@ -239,7 +225,7 @@ namespace GCatcode.Repository.DB.UserServices
         public IEnumerable<UserItem> Search(string userName, int page)
         {
             return DbConnection.Query<UserItem>(
-                $@"SELECT UserId, UserName FROM [dbo].[Users]
+                $@"SELECT UserId, UserName FROM [dbo].[TR_Users]
                     WHERE UserName LIKE @userName AND Available = 1
                     ORDER BY UserName
                     OFFSET {(page - 1) * 10} ROWS FETCH NEXT 10 ROWS ONLY",
@@ -249,7 +235,7 @@ namespace GCatcode.Repository.DB.UserServices
         public UserDTO? GetByEmail(string email)
         {
             return DbConnection.QueryFirstOrDefault<UserDTO>(
-                @"SELECT * FROM [dbo].[Users] WHERE Email = @email", new { email = email.ToLower() }, Transaction);
+                @"SELECT * FROM [dbo].[TR_Users] WHERE Email = @email", new { email = email.ToLower() }, Transaction);
         }
     }
 }

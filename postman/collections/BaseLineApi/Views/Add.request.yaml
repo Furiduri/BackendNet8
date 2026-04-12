@@ -1,0 +1,24 @@
+$kind: http-request
+name: Add
+url: "{{URLAPI}}/Views"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"name\": \"Test\",\r
+
+    \  \"route\": \"/test\",\r
+
+    \  \"icon\": \"code\",\r
+
+    \  \"description\": \"Test view\",\r
+
+    \  \"parentViewId\": null,\r
+
+    \  \"order\": 1,\r
+
+    \  \"isActive\": false\r
+
+    }"
+order: 6000

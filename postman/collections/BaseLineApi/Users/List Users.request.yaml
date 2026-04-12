@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{URLAPI}}/admin/Users?page=1&available=true"
+method: GET
+queryParams:
+  page: "1"
+  available: "true"
+order: 1000

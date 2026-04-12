@@ -22,81 +22,193 @@ namespace GCatcode.DataBase.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.RefreshToken", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.CL_Permission", b =>
                 {
-                    b.Property<int>("RefreshTokenId")
+                    b.Property<int>("PermissionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefreshTokenId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PermissionId"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("Available")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<DateTime>("CreateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("CreatedByIp")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("ExpiryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRevoked")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("LastUpdated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<string>("ReplacedByToken")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RevokedByIp")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Token")
+                    b.Property<string>("Resource")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.HasKey("PermissionId");
 
-                    b.HasKey("RefreshTokenId");
+                    b.HasIndex("Code")
+                        .IsUnique();
 
-                    b.HasIndex("Token")
-                        .IsUnique()
-                        .HasDatabaseName("IX_RefreshTokens_Token");
+                    b.HasIndex("Resource", "Action");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_RefreshTokens_UserId");
+                    b.ToTable("CL_Permissions", (string)null);
 
-                    b.HasIndex("ExpiryDate", "IsRevoked")
-                        .HasDatabaseName("IX_RefreshTokens_ExpiryDate_IsRevoked");
-
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.HasData(
+                        new
+                        {
+                            PermissionId = 1,
+                            Action = "read",
+                            Available = true,
+                            Code = "users.read",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ver usuarios",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "users"
+                        },
+                        new
+                        {
+                            PermissionId = 2,
+                            Action = "write",
+                            Available = true,
+                            Code = "users.write",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Crear/Editar usuarios",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "users"
+                        },
+                        new
+                        {
+                            PermissionId = 3,
+                            Action = "delete",
+                            Available = true,
+                            Code = "users.delete",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Eliminar usuarios",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "users"
+                        },
+                        new
+                        {
+                            PermissionId = 4,
+                            Action = "read",
+                            Available = true,
+                            Code = "roles.read",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ver roles",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "roles"
+                        },
+                        new
+                        {
+                            PermissionId = 5,
+                            Action = "write",
+                            Available = true,
+                            Code = "roles.write",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Crear/Editar roles",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "roles"
+                        },
+                        new
+                        {
+                            PermissionId = 6,
+                            Action = "delete",
+                            Available = true,
+                            Code = "roles.delete",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Eliminar roles",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "roles"
+                        },
+                        new
+                        {
+                            PermissionId = 7,
+                            Action = "read",
+                            Available = true,
+                            Code = "permissions.read",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ver permisos",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "permissions"
+                        },
+                        new
+                        {
+                            PermissionId = 8,
+                            Action = "write",
+                            Available = true,
+                            Code = "permissions.write",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Asignar permisos",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "permissions"
+                        },
+                        new
+                        {
+                            PermissionId = 9,
+                            Action = "read",
+                            Available = true,
+                            Code = "views.read",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Ver vistas/menús",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "views"
+                        },
+                        new
+                        {
+                            PermissionId = 10,
+                            Action = "write",
+                            Available = true,
+                            Code = "views.write",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Gestionar vistas/menús",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "views"
+                        },
+                        new
+                        {
+                            PermissionId = 11,
+                            Action = "admin",
+                            Available = true,
+                            Code = "system.admin",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Administración total del sistema",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "system"
+                        },
+                        new
+                        {
+                            PermissionId = 12,
+                            Action = "config",
+                            Available = true,
+                            Code = "system.config",
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Configurar sistema",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Resource = "system"
+                        });
                 });
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.Rol", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.CL_Rol", b =>
                 {
                     b.Property<int>("RolId")
                         .ValueGeneratedOnAdd()
@@ -130,10 +242,728 @@ namespace GCatcode.DataBase.Migrations
 
                     b.HasKey("RolId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("CL_Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "All Access Development",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Dev"
+                        },
+                        new
+                        {
+                            RolId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Limited Access",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Guest"
+                        },
+                        new
+                        {
+                            RolId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Access parcial",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "User"
+                        },
+                        new
+                        {
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "All Access Administration",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Admin"
+                        });
                 });
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.User", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.CL_View", b =>
+                {
+                    b.Property<int>("ViewId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ViewId"));
+
+                    b.Property<bool>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentViewId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Route")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("ViewId");
+
+                    b.ToTable("CL_Views", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ViewId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "",
+                            Icon = "DashboardIcon",
+                            IsActive = true,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Dashboard",
+                            Order = 1,
+                            Route = "/dashboard"
+                        },
+                        new
+                        {
+                            ViewId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "View for Adim tools",
+                            Icon = "admin",
+                            IsActive = true,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Admin",
+                            Order = 0,
+                            Route = "admin"
+                        },
+                        new
+                        {
+                            ViewId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "View for users management",
+                            Icon = "user",
+                            IsActive = true,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Users",
+                            Order = 0,
+                            ParentViewId = 1,
+                            Route = "admin/users"
+                        },
+                        new
+                        {
+                            ViewId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "View for roles management",
+                            Icon = "list",
+                            IsActive = true,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Roles",
+                            Order = 0,
+                            ParentViewId = 1,
+                            Route = "admin/roles"
+                        },
+                        new
+                        {
+                            ViewId = 5,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "View for permisos management",
+                            Icon = "auth",
+                            IsActive = true,
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Permisos",
+                            Order = 0,
+                            ParentViewId = 1,
+                            Route = "admin/permisos"
+                        });
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_RolePermission", b =>
+                {
+                    b.Property<int>("RolePermissionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolePermissionId"));
+
+                    b.Property<bool>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RolId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RolePermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RolId", "PermissionId")
+                        .IsUnique();
+
+                    b.ToTable("RL_RolePermissions", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            RolePermissionId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 1,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 2,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 3,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 4,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 5,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 5,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 6,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 6,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 7,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 7,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 8,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 8,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 9,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 9,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 10,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 10,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 11,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 11,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 12,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 12,
+                            RolId = 1
+                        },
+                        new
+                        {
+                            RolePermissionId = 13,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 1,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 14,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 2,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 15,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 3,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 16,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 4,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 17,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 5,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 18,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 7,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 19,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 8,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 20,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 9,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 21,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 10,
+                            RolId = 4
+                        },
+                        new
+                        {
+                            RolePermissionId = 22,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 1,
+                            RolId = 3
+                        },
+                        new
+                        {
+                            RolePermissionId = 23,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 4,
+                            RolId = 3
+                        },
+                        new
+                        {
+                            RolePermissionId = 24,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 9,
+                            RolId = 3
+                        },
+                        new
+                        {
+                            RolePermissionId = 25,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PermissionId = 9,
+                            RolId = 2
+                        });
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_UserPermission", b =>
+                {
+                    b.Property<int>("UserPermissionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserPermissionId"));
+
+                    b.Property<bool>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Conditions")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("IsGranted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserPermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("UserId", "PermissionId")
+                        .IsUnique();
+
+                    b.ToTable("RL_UserPermissions", (string)null);
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_UserRol", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RolId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.HasKey("UserId", "RolId");
+
+                    b.HasIndex("RolId");
+
+                    b.ToTable("RL_UserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = 1,
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            RolId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = 3,
+                            RolId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            UserId = 4,
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_ViewRol", b =>
+                {
+                    b.Property<int>("ViewId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RolId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Available")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreateTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.HasKey("ViewId", "RolId");
+
+                    b.HasIndex("RolId");
+
+                    b.ToTable("RL_ViewRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            ViewId = 1,
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 3,
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 4,
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 5,
+                            RolId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 1,
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 3,
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 4,
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 5,
+                            RolId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 1,
+                            RolId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            ViewId = 1,
+                            RolId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.TR_RefreshToken", b =>
+                {
+                    b.Property<int>("RefreshTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefreshTokenId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ReplacedByToken")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RevokedByIp")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RefreshTokenId");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasDatabaseName("IX_RefreshTokens_Token");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_RefreshTokens_UserId");
+
+                    b.HasIndex("ExpiryDate", "IsRevoked")
+                        .HasDatabaseName("IX_RefreshTokens_ExpiryDate_IsRevoked");
+
+                    b.ToTable("TR_RefreshTokens", (string)null);
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.TR_User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -171,63 +1001,105 @@ namespace GCatcode.DataBase.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
+
                     b.HasIndex("UserName")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("TR_Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "dev@local.com",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Password = "io1YjvMsA3LEQ+gR04dQzm+epMPymJk9DyVlE3RYPqEiiU3Y7e7T959OVaxfihst",
+                            UserName = "Dev"
+                        },
+                        new
+                        {
+                            UserId = 2,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "guest@local.com",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Password = "e1t+3NBY04evdGNyxnnxxqjUBubBnTNk70nbxfc/tkLL5I4DPuA64y2PqxeaCIGA",
+                            UserName = "Guest"
+                        },
+                        new
+                        {
+                            UserId = 3,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "user@local.com",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Password = "A0kS7WbBH03fl86Y8Ko5DTuPLJRapViD3Yh4HoLwSgcoxIY/H9iNH3WPGlq30JCZ",
+                            UserName = "User"
+                        },
+                        new
+                        {
+                            UserId = 4,
+                            Available = true,
+                            CreateTime = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@local.com",
+                            LastUpdated = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Password = "lFONJXpDxXzLRAje8S8hFGeDd5sp4C3UWfxtR1ZeXNcYVgLCA450RwfkXUN8JPV/",
+                            UserName = "Admin"
+                        });
                 });
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.UserRol", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_RolePermission", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.HasOne("GCatcode.DataBase.Models.CL_Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("RolId")
-                        .HasColumnType("int");
+                    b.HasOne("GCatcode.DataBase.Models.CL_Rol", "Role")
+                        .WithMany()
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<bool>("Available")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                    b.Navigation("Permission");
 
-                    b.Property<DateTime>("CreateTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<DateTime>("LastUpdated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.HasKey("UserId", "RolId");
-
-                    b.HasIndex("RolId");
-
-                    b.ToTable("UserRoles");
+                    b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.RefreshToken", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_UserPermission", b =>
                 {
-                    b.HasOne("GCatcode.DataBase.Models.User", "User")
+                    b.HasOne("GCatcode.DataBase.Models.CL_Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GCatcode.DataBase.Models.TR_User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_RefreshTokens_Users");
+                        .IsRequired();
+
+                    b.Navigation("Permission");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.UserRol", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_UserRol", b =>
                 {
-                    b.HasOne("GCatcode.DataBase.Models.Rol", "Rol")
+                    b.HasOne("GCatcode.DataBase.Models.CL_Rol", "Rol")
                         .WithMany("UserRoles")
                         .HasForeignKey("RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GCatcode.DataBase.Models.User", "User")
+                    b.HasOne("GCatcode.DataBase.Models.TR_User", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -238,12 +1110,50 @@ namespace GCatcode.DataBase.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.Rol", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.RL_ViewRol", b =>
                 {
-                    b.Navigation("UserRoles");
+                    b.HasOne("GCatcode.DataBase.Models.CL_Rol", "Rol")
+                        .WithMany("ViewRols")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GCatcode.DataBase.Models.CL_View", "View")
+                        .WithMany("ViewRols")
+                        .HasForeignKey("ViewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rol");
+
+                    b.Navigation("View");
                 });
 
-            modelBuilder.Entity("GCatcode.DataBase.Models.User", b =>
+            modelBuilder.Entity("GCatcode.DataBase.Models.TR_RefreshToken", b =>
+                {
+                    b.HasOne("GCatcode.DataBase.Models.TR_User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_RefreshTokens_Users");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.CL_Rol", b =>
+                {
+                    b.Navigation("UserRoles");
+
+                    b.Navigation("ViewRols");
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.CL_View", b =>
+                {
+                    b.Navigation("ViewRols");
+                });
+
+            modelBuilder.Entity("GCatcode.DataBase.Models.TR_User", b =>
                 {
                     b.Navigation("UserRoles");
                 });

@@ -3,18 +3,17 @@ using System.Text.Json.Serialization;
 
 namespace GCatcode.Api.Core
 {
-    public class ApiResponse<T>
+    public class ApiResponse<T> where T : class
     {
         public bool IsSuccess { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Message { get; set; } = null;
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        
         public int StatusCode { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public T Data { get; set; }
+        public T Data { get; set; } = null;
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<string> Errors { get; set; } = null;
@@ -40,14 +39,15 @@ namespace GCatcode.Api.Core
             };
         }
 
-        public static ApiResponse<T> Result(StatusResponse statusResponse, T data)
+        public static ApiResponse<T> Result(StatusResponse statusResponse, T data = null)
         {
             return new ApiResponse<T>
             {
                 IsSuccess = statusResponse.isSuccess,
                 StatusCode = (int)statusResponse.StatusCode,
                 Data = data,
-                Errors = new List<string>() { statusResponse.Message }
+                Message = statusResponse.isSuccess ? statusResponse.Message : null,
+                Errors = statusResponse.isSuccess ? null : new List<string>() { statusResponse.Message }
             };
         }
     }

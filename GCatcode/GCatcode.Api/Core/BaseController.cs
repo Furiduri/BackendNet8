@@ -1,6 +1,9 @@
 ﻿using GCatcode.Api.Configuration;
-using GCatcode.Repository.DB.RolServices.Models;
+using GCatcode.Services.DB.PermissionServices;
+using GCatcode.Services.DB.PermissionServices.Models;
+using GCatcode.Services.DB.RolServices.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System.Security.Claims;
 
 namespace GCatcode.Api.Core
@@ -8,10 +11,9 @@ namespace GCatcode.Api.Core
     public class BaseController : ControllerBase
     {
         protected readonly AppSettings _configuration;
-
         public BaseController(AppSettings configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration;            
         }
 
         protected bool IsAdmin => GetRoles()?.Any(c => c == RolesType.Admin.ToString() || c == RolesType.Dev.ToString()) ?? false;
@@ -25,7 +27,7 @@ namespace GCatcode.Api.Core
             {
                 UserName = User.FindFirstValue(ClaimTypes.Name);
             }
-            return UserName;
+            return UserName ?? string.Empty;
         }
 
         private string UserEmail { get; set; }
@@ -37,7 +39,7 @@ namespace GCatcode.Api.Core
             {
                 UserEmail = User.FindFirstValue(ClaimTypes.Email);
             }
-            return UserEmail;
+            return UserEmail ?? string.Empty;
         }
 
         private int? UserId { get; set; }
@@ -64,6 +66,59 @@ namespace GCatcode.Api.Core
                 Roles = claims.Select(x => x.Value);
             }
             return Roles;
+        }
+
+        // ===== MÉTODOS PARA PERMISOS (RBAC + ABAC) =====
+
+        private IEnumerable<UserPermissionResult> _userPermissions;
+
+        /// <summary>
+        /// Obtiene todos los permisos del usuario actual (RBAC + ABAC)
+        /// </summary>
+        [NonAction]
+        protected IEnumerable<UserPermissionResult> GetUserPermissions()
+        {
+            if (_userPermissions == null)
+            {
+                using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
+                {
+                    var permissionService = new PermissionService(connection);
+                    _userPermissions = permissionService.GetUserPermissions(GetUserId()).ToList();
+                }
+            }
+            return _userPermissions;
+        }
+
+        /// <summary>
+        /// Verifica si el usuario tiene un permiso específico
+        /// Prioriza permisos directos sobre heredados de roles
+        /// </summary>
+        [NonAction]
+        protected bool HasPermission(string permissionCode)
+        {
+            using (var connection = new SqlConnection(_configuration.DB.DefaultConnection))
+            {
+                var permissionService = new PermissionService(connection);
+                return permissionService.HasPermission(GetUserId(), permissionCode);
+            }
+        }
+
+        /// <summary>
+        /// Verifica si el usuario tiene todos los permisos especificados
+        /// </summary>
+        [NonAction]
+        protected bool HasAllPermissions(params string[] permissionCodes)
+        {
+            return permissionCodes.All(code => HasPermission(code));
+        }
+
+        /// <summary>
+        /// Verifica si el usuario tiene al menos uno de los permisos especificados
+        /// </summary>
+        [NonAction]
+        protected bool HasAnyPermission(params string[] permissionCodes)
+        {
+            return permissionCodes.Any(code => HasPermission(code));
         }
 
         [NonAction]

@@ -21,7 +21,7 @@ var jwtSettings = builder.Configuration
 var appSettingsConfig = builder.Configuration
     .GetSection("AppSettings")
     .Get<AppSettings>() ?? new AppSettings();
-
+appSettingsConfig.Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 appSettingsConfig.DB = connectionStrings;
 appSettingsConfig.JwtSettings = jwtSettings;
 
@@ -31,6 +31,7 @@ builder.Services.AddSingleton(appSettingsConfig);
 builder.Services.AddDbContext<AppDBContext>(dbContext =>
 {
     dbContext.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    dbContext.ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
 });
 
 // Register Dapper/SQL Connection
