@@ -1,0 +1,11 @@
+.git
+.github
+.postman
+postman
+Snippet
+**/bin
+**/obj
+**/TestResults
+**/.vs
+**/.vscode
+*.user
